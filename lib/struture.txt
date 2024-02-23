@@ -1,0 +1,29 @@
+main.dart
+app.dart
+path_const.dart
+_pages.dart 
+_bloc.dart 
+_model.dart 
+globalization.json
+enum_global.dart 
+custom_icons.dart 
+
+for each page -> page.dart, page_bloc.dart, page_state.dart, page_event.dart 
+
+
+font folder will put the font used by flutter liek Poppins, Roboto, ...
+
+Need do research on how to apply
+flutter localization
+badges
+cryto
+device info plus
+flutter jailbreak detection
+fading edge scrollview
+flutter dotenv
+intl
+percent indicator
+infinite list view
+add 2 calendar
+rate my app
+share plus

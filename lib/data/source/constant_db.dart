@@ -1,0 +1,1 @@
+const String rawItemsURL = "https://my-json-server.typicode.com/jumail-utm/http_json/users";

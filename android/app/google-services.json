@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1065858349488",
+    "project_id": "virtualfurnish-93c69",
+    "storage_bucket": "virtualfurnish-93c69.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1065858349488:android:2ccd51b213b3d40cf1be75",
+        "android_client_info": {
+          "package_name": "com.example.virtual_furnish_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1065858349488-mb5v8bqfhqst4pmt277qt5o5eb7a4kdj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.virtual_furnish_app",
+            "certificate_hash": "849b5f67dc6fd12b1a63b1fc5d7ab5f5edfab266"
+          }
+        },
+        {
+          "client_id": "1065858349488-77dbqs110mlhrc4lu8umkans8nl9lu3e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxBThcjivoAhrnUdrEhPHl0AjiriJiMo8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1065858349488-77dbqs110mlhrc4lu8umkans8nl9lu3e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1065858349488-cjhekmcq2bcqjhgmogmpjckassmj2r20.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.virtualFurnishApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

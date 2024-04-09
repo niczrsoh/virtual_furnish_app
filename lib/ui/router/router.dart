@@ -1,19 +1,44 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:virtual_furnish_app/bloc/Authentication/bloc/login_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Authentication/Login/login_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Home/home_bloc.dart';
-import 'package:virtual_furnish_app/bloc/Master/bloc/master_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/counter_cubit.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/item_detail_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/item_list_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Master/master_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Profile/bloc/edit_profile_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Profile/bloc/seller_register_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Profile/bloc/user_profile_bloc.dart';
+import 'package:virtual_furnish_app/data/model/item_model.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_phone.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/otp_verification_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/register_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Common/three_dimension_object_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Common/video_player_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Home/home_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/item_detail_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/items_list_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Profile/edit_profile_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Profile/seller_registration_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Profile/user_profile_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Sold/create_selling_item_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/master_page.dart';
 import 'package:virtual_furnish_app/ui/router/pages_const.dart';
 import 'package:virtual_furnish_app/ui/Screens/root_page.dart';
 
 class AppRouter {
-  static final homeBloc = HomeBloc();
+  static final HomeBloc homeBloc = HomeBloc()..add(HomeDataFetched(title: ""));
+  static final EditProfileBloc editProfileBloc = EditProfileBloc();
+  static final MasterBloc masterbloc = MasterBloc();
+  static final UserProfileBloc userProfileBloc = UserProfileBloc();
+  static final ItemListBloc itemListBloc = ItemListBloc();
+  static final ItemDetailBloc itemDetailBloc = ItemDetailBloc();
+  final CounterCubit _counterCubit = CounterCubit();
+  static final SellerRegisterBloc sellerRegister = SellerRegisterBloc();
   static Route onGenerateRoute(RouteSettings settings) {
     Map? args = settings.arguments as Map<String, dynamic>?;
     switch (settings.name) {
@@ -25,7 +50,13 @@ class AppRouter {
       case PagePath.pathHome:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => HomePage(title: args?['title'] ?? ""),
+          builder: (_) => BlocProvider<HomeBloc>.value(
+            value: homeBloc,
+            child: HomePage(
+              title: args?['title'] ?? "",
+              homeBloc: homeBloc,
+            ),
+          ),
         );
       case PagePath.pathLogin:
         return MaterialPageRoute(
@@ -39,10 +70,64 @@ class AppRouter {
       case PagePath.pathOtpVerfication:
         return MaterialPageRoute(
             settings: settings, builder: (context) => OtpVerificationPage());
+      case PagePath.pathEditProfile:
+        return MaterialPageRoute(
+            settings: settings,
+            builder: (context) => BlocProvider<EditProfileBloc>.value(
+                  value: editProfileBloc
+                    ..add(FetchUserProfile(
+                        id: AuthRepo.getCurrentUserId() ?? "")),
+                  child: EditProfilePage(bloc: editProfileBloc),
+                ));
       case PagePath.pathMaster:
         return MaterialPageRoute(
             settings: settings,
-            builder: (context) => MasterPage());
+            builder: (context) => BlocProvider<MasterBloc>.value(
+                  value: masterbloc..add(FetchUserData()),
+                  child: MasterPage(bloc: masterbloc),
+                ));
+      case PagePath.pathSellerRegister:
+        return MaterialPageRoute(
+            settings: settings,
+            builder: (context) => BlocProvider<SellerRegisterBloc>.value(
+                  value: sellerRegister,
+                  child: SellerRegistrationPage(bloc: sellerRegister),
+                ));
+      case PagePath.pathVideoPlayer:
+        return MaterialPageRoute(
+            settings: settings,
+            builder: (context) =>  VideoPlayerScreen(uri: args?['uri'], videoFile: args?['videoFile']));
+      case PagePath.pathMarketplace:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const MarketplacePage(),
+        );
+      case PagePath.pathItemList:
+        if(args?['title']!=null){
+          itemListBloc.add(ItemListFetchedByTitle(title: args?['title']));
+        }else{
+          itemListBloc.add(ItemListFetchedByCategory(category: args?['category']));
+        }
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) =>  BlocProvider<ItemListBloc>.value(
+                  value: itemListBloc,
+                  child: ItemsListPage(itemsListBloc: itemListBloc, title: args?['title'], category: args?['category'],),
+                ),
+        );
+      case PagePath.pathItemDetail:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider<ItemDetailBloc>.value(
+                  value: itemDetailBloc..add(ItemDetailFetched(id: args?['id'])),
+                  child: ItemDetailsPage(itemDetailBloc: itemDetailBloc),
+                ),
+        );
+      case PagePath.path3DModelViewer:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) =>  ThreeDimensionObjectPage(objectPath: args?['path'],),
+        );
       default:
         return MaterialPageRoute(
           settings: settings,

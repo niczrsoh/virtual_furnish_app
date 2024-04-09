@@ -15,7 +15,17 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginPageEnableButton>(enableButton);
   }
 
-  FutureOr<void> fillLoginForm(FillLoginForm event, Emitter<LoginState> emit) {
+  FutureOr<void> fillLoginForm(FillLoginForm event, Emitter<LoginState> emit) async {
+    if (event.email.isNotEmpty && event.password.isNotEmpty) {
+      String message = await AuthRepo.loginWithEmailandPassword(event.email, event.password);
+      if(message == "Login Success"){
+      emit(LoginSuccess(message: message));}
+      else{
+        emit(LoginFail(message: message));
+      } 
+    } else {
+      emit(LoginFail(message: "Login  Failed"));
+    }
   }
   Future<FutureOr<void>> selectGoogleAccount(SelectGoogleAccount event, Emitter<LoginState> emit) async {
       String message = await AuthRepo.signInWithGoogle();

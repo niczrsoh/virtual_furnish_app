@@ -6,6 +6,11 @@ import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/user_repo.dart';
 
 class AuthRepo {
+  //get current user id
+  static String? getCurrentUserId() {
+    if(FirebaseAuth.instance.currentUser != null)
+    return FirebaseAuth.instance.currentUser!.uid;
+  }
 //1. Login anonymously with firebase
   static Future<String> addGuest() async {
     try {
@@ -74,7 +79,7 @@ class AuthRepo {
           await FirebaseAuth.instance.signInWithCredential(credential);
       if (userCredential.additionalUserInfo!.isNewUser == true) {
         UserModel userModel = UserModel(
-          id: credential.idToken,
+          id: userCredential.user!.uid,
           username: googleUser!.displayName,
           email: googleUser!.email,
           profilePic: googleUser!.photoUrl,

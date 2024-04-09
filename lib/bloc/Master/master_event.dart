@@ -7,11 +7,13 @@ sealed class MasterEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+class FetchUserData extends MasterEvent {
+  FetchUserData();
+}
 
 class TabChange extends MasterEvent {
   int tabIndex;
   TabChange({
     required this.tabIndex,
   });
-  
 }

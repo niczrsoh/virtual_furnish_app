@@ -26,4 +26,6 @@ class CustomColor{
     static Color primaryDarkTextColor = Colors.white;
     static Color successColor = const Color(0xFF4BB543);
     static Color failColor = const Color(0xFFB00020);
+    static Color transparent = const Color(0x00000000);
+    static Color priceTagColor = const Color(0xFFB00020);
 }

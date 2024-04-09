@@ -4,15 +4,18 @@ import 'package:virtual_furnish_app/ui/Styles/color_styles.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton(
-      {super.key, required this.onPressed, required this.buttonText,required this.isDisabled,  this.width,  this.radius});
+      {super.key, required this.onPressed, required this.buttonText,required this.isDisabled,  this.width,  this.radius, this.icon, this.height});
   final VoidCallback? onPressed;
   final String? buttonText;
   final bool isDisabled;
   final double? width;
   final double? radius;
+  final double? height;
+  final IconData? icon;
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height??mq.height*0.06,
       width: width??mq.width*0.8,
       decoration: BoxDecoration(
         boxShadow: const[
@@ -35,19 +38,27 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
+          elevation: 0,
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12)),
           ),
         ),
-        child: Text(
-          buttonText!,
-          style: TextStyle(
-            fontSize: 15.0,
-            fontWeight: FontWeight.w400,
-            color: (isDisabled)?CustomColor.disabledTextColor:CustomColor.primaryDarkTextColor,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if(icon!=null)...[ Icon(icon, color: Colors.white, size: 15,),SizedBox(width: 5,)],
+            Flexible(
+              child: Text(
+              buttonText!,
+              style: TextStyle(
+                fontSize: 15.0,
+                fontWeight: FontWeight.w400,
+                color: (isDisabled)?CustomColor.disabledTextColor:CustomColor.primaryDarkTextColor,
+              ),
+                        ),
+            ),]
         ),
       ),
     );

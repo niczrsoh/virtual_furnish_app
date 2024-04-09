@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:virtual_furnish_app/main.dart';
 import 'package:virtual_furnish_app/ui/Styles/color_styles.dart';
 
 class SecondaryCustomButton extends StatelessWidget {
   const SecondaryCustomButton(
-      {super.key, required this.onPressed, required this.buttonText,required this.isDisabled,  this.width,  this.radius, this.icon});
+      {super.key, required this.onPressed, required this.buttonText,required this.isDisabled,  this.width,  this.radius, this.icon, this.height});
   final VoidCallback? onPressed;
   final String? buttonText;
   final bool isDisabled;
   final double? width;
+  final double? height;
   final double? radius;
   final Icon? icon;
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: height??mq.height*0.06,
       width: width??double.infinity,
       decoration: BoxDecoration(
         boxShadow: const[
@@ -35,12 +39,14 @@ class SecondaryCustomButton extends StatelessWidget {
           children: [
             icon??Container(),
             SizedBox(width: 10,),
-            Text(
-              buttonText!,
-              style: TextStyle(
-                fontSize: 15.0,
-                fontWeight: FontWeight.w400,
-                color: (isDisabled)?CustomColor.disabledTextColor:CustomColor.vfPrimaryColor,
+            Flexible(
+              child: Text(
+                buttonText!,
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w400,
+                  color: (isDisabled)?CustomColor.disabledTextColor:CustomColor.vfPrimaryColor,
+                ),
               ),
             ),
           ],

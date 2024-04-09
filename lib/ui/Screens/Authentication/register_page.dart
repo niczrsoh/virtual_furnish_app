@@ -7,7 +7,7 @@ import 'package:virtual_furnish_app/main.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_button.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_snackbar.dart';
 
-import '../../../bloc/Authentication/bloc/Register/register_bloc.dart';
+import '../../../bloc/Authentication/Register/register_bloc.dart';
 
 class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});

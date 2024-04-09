@@ -10,13 +10,13 @@ class HomePage extends StatelessWidget {
   const HomePage({
     Key? key,
    this.title,
+   required this.homeBloc,
   }) : super(key: key);
   final String? title;
-  static HomeBloc homeBloc = HomeBloc();
-
+  final HomeBloc homeBloc;
   @override
   Widget build(BuildContext context) {
-    homeBloc.add(HomeDataFetched(title: title??""));
+   // homeBloc.add(HomeDataFetched(title: title??""));
     return PopScope(
       onPopInvoked: (isPop) {
         FocusScopeNode focusNode = FocusScope.of(context);

@@ -25,6 +25,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
           email: event.email,
           profilePic: "",   
           sell: "",
+          age: 0,
           deliveredAddress: [],
           contact: "",
           status: "Active",

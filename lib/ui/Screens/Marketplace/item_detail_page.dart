@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/counter_cubit.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/counter_state.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/item_detail_bloc.dart';
@@ -16,9 +17,14 @@ import 'package:virtual_furnish_app/ui/Widgets/custom_button.dart';
 import 'package:virtual_furnish_app/ui/Widgets/secondary_custom_button.dart';
 
 class ItemDetailsPage extends StatelessWidget {
-  ItemDetailsPage({super.key, this.itemDetail, required this.itemDetailBloc});
+  ItemDetailsPage(
+      {super.key,
+      this.itemDetail,
+      required this.itemDetailBloc,
+      required this.cartBloc});
   final String? itemDetail;
   final ItemDetailBloc itemDetailBloc;
+  final CartBloc cartBloc;
   int numberOfItems = 1;
   bool isButtonDisabled = false;
   @override
@@ -114,6 +120,7 @@ class ItemDetailsPage extends StatelessWidget {
                                           child: BlocBuilder<CounterCubit,
                                               CounterState>(
                                             builder: (context, state) {
+                                              int count = state.counterValue;
                                               return Container(
                                                 padding:
                                                     PaddingStyles.paddingStyle1,
@@ -127,10 +134,15 @@ class ItemDetailsPage extends StatelessWidget {
                                                   children: [
                                                     Text(
                                                         "Add ${currentState.itemData.name} to cart ?"),
-                                                     SizedBox(height: mq.height * 0.02,),
-                                                    Text("Number of items added: "),
+                                                    SizedBox(
+                                                      height: mq.height * 0.02,
+                                                    ),
+                                                    Text(
+                                                        "Number of items added: "),
                                                     Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
                                                       children: [
                                                         IconButton(
                                                             onPressed: () {
@@ -148,9 +160,9 @@ class ItemDetailsPage extends StatelessWidget {
                                                         //         '${counterValue}');
                                                         //   }
                                                         // )
-                                                        Text(state.counterValue
+                                                        Text(count
                                                             .toString()),
-                                                        IconButton(
+                                                            IconButton(
                                                             onPressed: () {
                                                               context
                                                                   .read<
@@ -159,14 +171,19 @@ class ItemDetailsPage extends StatelessWidget {
                                                             },
                                                             icon: Icon(
                                                                 Icons.add)),
+                                                       
                                                       ],
                                                     ),
-                                                      SizedBox(height: mq.height * 0.02,),
+                                                    SizedBox(
+                                                      height: mq.height * 0.02,
+                                                    ),
                                                     SecondaryCustomButton(
                                                       onPressed: () {
+                                                         debugPrint('id: ${currentState.itemData.id}');
+                                                         cartBloc.add(AddToCart(count, "low", currentState.itemData.id!));
                                                         //will call bloc to add item into cart
                                                         //will show snackbar that item has been added to cart
-                                                      //  itemDetailBloc.add(event);
+                                                        //  itemDetailBloc.add(event);
                                                       },
                                                       buttonText:
                                                           'Add into cart',

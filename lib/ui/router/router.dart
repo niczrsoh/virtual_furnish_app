@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Authentication/Login/login_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Home/home_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/checkout_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/counter_cubit.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/item_detail_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/item_list_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/payment_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Master/master_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/edit_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/seller_register_bloc.dart';
@@ -19,9 +22,13 @@ import 'package:virtual_furnish_app/ui/Screens/Authentication/register_page.dart
 import 'package:virtual_furnish_app/ui/Screens/Common/three_dimension_object_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Common/video_player_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Home/home_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/cart_product_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/checkout_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/delivery_addresses_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/item_detail_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/items_list_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/payment_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/edit_profile_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/seller_registration_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/user_profile_page.dart';
@@ -36,7 +43,10 @@ class AppRouter {
   static final MasterBloc masterbloc = MasterBloc();
   static final UserProfileBloc userProfileBloc = UserProfileBloc();
   static final ItemListBloc itemListBloc = ItemListBloc();
+  static final CheckoutBloc checkoutBloc = CheckoutBloc();
+  static final PaymentBloc paymentBloc = PaymentBloc();
   static final ItemDetailBloc itemDetailBloc = ItemDetailBloc();
+  static final CartBloc cartBloc = CartBloc();
   final CounterCubit _counterCubit = CounterCubit();
   static final SellerRegisterBloc sellerRegister = SellerRegisterBloc();
   static Route onGenerateRoute(RouteSettings settings) {
@@ -96,37 +106,81 @@ class AppRouter {
       case PagePath.pathVideoPlayer:
         return MaterialPageRoute(
             settings: settings,
-            builder: (context) =>  VideoPlayerScreen(uri: args?['uri'], videoFile: args?['videoFile']));
+            builder: (context) => VideoPlayerScreen(
+                uri: args?['uri'], videoFile: args?['videoFile']));
       case PagePath.pathMarketplace:
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const MarketplacePage(),
         );
       case PagePath.pathItemList:
-        if(args?['title']!=null){
+        if (args?['title'] != null) {
           itemListBloc.add(ItemListFetchedByTitle(title: args?['title']));
-        }else{
-          itemListBloc.add(ItemListFetchedByCategory(category: args?['category']));
+        } else {
+          itemListBloc
+              .add(ItemListFetchedByCategory(category: args?['category']));
         }
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) =>  BlocProvider<ItemListBloc>.value(
-                  value: itemListBloc,
-                  child: ItemsListPage(itemsListBloc: itemListBloc, title: args?['title'], category: args?['category'],),
-                ),
+          builder: (_) => BlocProvider<ItemListBloc>.value(
+            value: itemListBloc,
+            child: ItemsListPage(
+              itemsListBloc: itemListBloc,
+              title: args?['title'],
+              category: args?['category'],
+            ),
+          ),
         );
       case PagePath.pathItemDetail:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BlocProvider<ItemDetailBloc>.value(
-                  value: itemDetailBloc..add(ItemDetailFetched(id: args?['id'])),
-                  child: ItemDetailsPage(itemDetailBloc: itemDetailBloc),
-                ),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider<ItemDetailBloc>.value(
+                value: itemDetailBloc..add(ItemDetailFetched(id: args?['id'])),
+              ),
+               BlocProvider<CartBloc>.value(
+                value: cartBloc,
+              ),
+            ],
+            child: ItemDetailsPage(itemDetailBloc: itemDetailBloc, cartBloc: cartBloc),
+          ),
         );
       case PagePath.path3DModelViewer:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) =>  ThreeDimensionObjectPage(objectPath: args?['path'],),
+          builder: (_) => ThreeDimensionObjectPage(
+            objectPath: args?['path'],
+          ),
+        );
+      case PagePath.pathCart:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider<CartBloc>.value(
+            value: cartBloc,
+            child: CartProductPage(cartBloc: cartBloc),
+          ),
+        );
+      case PagePath.pathPayment:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider<PaymentBloc>.value(
+            value: paymentBloc,
+            child: PaymentPage(paymentBloc: paymentBloc),
+          ),
+        );
+     case PagePath.pathDeliveryAddress:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_)=> const DeliveryAddressesPage(),
+        );
+      case PagePath.pathCheckout:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider<CheckoutBloc>.value(
+            value: checkoutBloc..add(LoadCheckout(cartProducts: args?['cartList'])),
+            child: CheckoutPage(checkoutBloc: checkoutBloc),
+          ),
         );
       default:
         return MaterialPageRoute(

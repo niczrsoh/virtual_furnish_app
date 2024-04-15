@@ -189,7 +189,10 @@ class MarketplaceRepo{
     try{
       DocumentSnapshot documentSnapshot = await _productCollection.doc(id).get();
       
-      return MarketplaceProductModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);}
+      MarketplaceProductModel model= MarketplaceProductModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      model.id = documentSnapshot.id;
+      return model;
+      }
     catch(e){
       throw e;
     }

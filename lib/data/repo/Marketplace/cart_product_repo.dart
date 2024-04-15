@@ -12,8 +12,28 @@ class CartProductRepo{
   static Future<String> addProductToCart(CartProductModel model) async {
     try{
       //create a new collection;
+      //get list of carts
+      List<CartProductModel> cartProducts = await getCartProducts();
       CollectionReference _cartCollection = _userCollection.doc(userID).collection("CartProduct");
-      _cartCollection.doc().set(model.toJson());
+      String? cartID;
+      int? prevAmount;
+      //using loop to check 
+      for(int i = 0; i < cartProducts.length; i++){
+        if(cartProducts[i].productID == model.productID){
+          cartID = cartProducts[i].id;
+          prevAmount = cartProducts[i].amount;
+          break;
+        }
+      }
+      if(cartID!=null){
+        int totalAmount = prevAmount! + model.amount!;
+        _cartCollection.doc(cartID).update(
+          {
+            "amount": totalAmount
+          }
+        );
+      }else{
+      _cartCollection.doc().set(model.toJson());}
       // Add product to cart
       return "Cart Product Added";
     }
@@ -36,19 +56,20 @@ class CartProductRepo{
     }
   }
   //update quantity of product
-    static Future<List<CartProductModel>> updateCartProduct(CartProductModel model){
+    static Future<String> updateCartProduct(CartProductModel model) async{
     try{
       CollectionReference _cartCollection = _userCollection.doc(userID).collection("CartProduct");
-      _cartCollection.doc().set(model.toJson());
-      return _cartCollection.get().then((value) => value.docs.map((e) {
-        CartProductModel model = CartProductModel.fromJson(e.data() as Map<String, dynamic>);
-        model.id = e.id;
-        return model;
-      }).toList());
+      await _cartCollection.doc(model.id).update(
+        {
+          "amount": model.amount,
+          "priority": model.priority
+        }
+      );
+      return "Successfully Updated";
     }
     catch(e){
       throw e;
     }
   }
-
+  
 }

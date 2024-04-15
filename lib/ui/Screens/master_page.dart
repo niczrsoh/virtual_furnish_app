@@ -3,12 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR Space/augmented_reality_space_page.dart';
 import 'package:virtual_furnish_app/bloc/Master/master_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/seller_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/user_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/create_selling_item_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/sold_list_bloc.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/cart_product_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/seller_profile_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/user_profile_page.dart';
@@ -35,6 +37,7 @@ List<BottomNavigationBarItem> sellerBottomNavBars =
 int tabIndex = 0;
 final UserProfileBloc userProfileBloc = UserProfileBloc();
 final SellerProfileBloc sellerProfileBloc = SellerProfileBloc();
+final CartBloc cartBloc = CartBloc()..add(LoadCart());
 final CreateSellingItemBloc createSellingItemBloc = CreateSellingItemBloc();
 final SoldListBloc soldListBloc = SoldListBloc()..add(SoldListDataFetched());
 List userBloc = [
@@ -45,7 +48,10 @@ List sellerBloc = [
 ];
 List<Widget> bottomNavScreen = [
   MarketplacePage(),
-  Text('index 1: cart'),
+  BlocProvider<CartBloc>.value(
+    value: cartBloc,
+    child: CartProductPage(cartBloc: cartBloc),
+  ),
   ARSpacePage(),
   Text('index 3: message'),
    BlocProvider<UserProfileBloc>.value(

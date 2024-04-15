@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text(
                       'Welcome to the future of furniture shop',
-                      style: CustomTextStyle.homePageTitleText(context),
+                      style: CustomTextStyle.primaryTitleText(context),
                       textAlign: TextAlign.center,
                     ),
                     Container(

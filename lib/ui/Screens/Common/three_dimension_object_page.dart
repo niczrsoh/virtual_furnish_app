@@ -15,8 +15,8 @@ class ThreeDimensionObjectPage extends StatelessWidget {
       ),
       body: Center(
         child: ModelViewer(
-          //src: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
-           src: objectPath,
+          src: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb',
+         //  src: objectPath,
           backgroundColor: Colors.white,
           ar: true,
           arModes: ['scene-viewer', 'webxr', 'quick-look'],

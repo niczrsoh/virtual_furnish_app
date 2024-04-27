@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:virtual_furnish_app/core/helpers/auth_provider.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/sell_account_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
@@ -14,6 +14,7 @@ part 'seller_register_state.dart';
   
 class SellerRegisterBloc extends Bloc<SellerRegisterEvent, SellerRegisterState> {
   SellerRegisterBloc() : super(SellerRegisterInitial()) {
+    on<SellerRegisterFetchList>(sellerRegisterFetchList);
     on<SellerRegisterCreate>(sellerRegisterCreate);
     on<SellerRegisterUploadDocument>(sellerRegisterUploadDocument);
     on<SellerRegisterBusinessType>(sellerRegisterBusinessType);
@@ -21,7 +22,8 @@ class SellerRegisterBloc extends Bloc<SellerRegisterEvent, SellerRegisterState> 
 
   Future<FutureOr<void>> sellerRegisterCreate(SellerRegisterCreate event, Emitter<SellerRegisterState> emit) async {
     final userID = await AuthRepo.getCurrentUserId();
-     final message = await AuthRepo.registerWithEmailandPassword(event.email, event.password);
+    
+     final message = await AuthRepo.registerSellerWithEmailandPassword(event.email, event.password);
       if (message == "Register Success") {
         SellerAccountModel sellerAccountModel = SellerAccountModel(
           id: FirebaseAuth.instance.currentUser!.uid,
@@ -53,5 +55,17 @@ class SellerRegisterBloc extends Bloc<SellerRegisterEvent, SellerRegisterState> 
 
   FutureOr<void> sellerRegisterBusinessType(SellerRegisterBusinessType event, Emitter<SellerRegisterState> emit) {
     emit(SellerRegisterBusinessTypeUpdated(businessType: event.businessType));
+  }
+
+  FutureOr<void> sellerRegisterFetchList(SellerRegisterFetchList event, Emitter<SellerRegisterState> emit) async {
+    //fetch seller list
+   await SellerRepo.getRegisteredShop().then((value) {
+    if(value.shopName == null){
+      emit(SellerRegisterListFetchedEmpty());
+    }else{
+      emit(SellerRegisterListFetchedSuccess(sellerList: value));}
+    }).catchError((e) {
+      emit(SellerRegisterListFetchedFail(message: e.toString()));
+    });
   }
 }

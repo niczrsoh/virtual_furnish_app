@@ -13,8 +13,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<AddPhoneNumber>(addPhoneNumber);
     on<AddGuest>(addGuest);
     on<LoginPageEnableButton>(enableButton);
+    on<VerifyCode>(verifyCode);
   }
-
   FutureOr<void> fillLoginForm(FillLoginForm event, Emitter<LoginState> emit) async {
     if (event.email.isNotEmpty && event.password.isNotEmpty) {
       String message = await AuthRepo.loginWithEmailandPassword(event.email, event.password);
@@ -30,15 +30,35 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Future<FutureOr<void>> selectGoogleAccount(SelectGoogleAccount event, Emitter<LoginState> emit) async {
       String message = await AuthRepo.signInWithGoogle();
       if (message == "Login Success") {
-        
         emit(LoginSuccess(message: message));
       } else {
         emit(LoginFail(message: message));
       }
   }
-  FutureOr<void> addPhoneNumber(AddPhoneNumber event, Emitter<LoginState> emit) {
-    
+  Future<void> addPhoneNumber(AddPhoneNumber event, Emitter<LoginState> emit)  async{
+    final FirebaseAuth auth = FirebaseAuth.instance;
+
+      auth.verifyPhoneNumber(
+        phoneNumber: event.phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async  {
+           auth.signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          // Verification failed
+          if (e.code == 'invalid-phone-number') {
+            emit(CodeFailed(message: "Invalid Phone Number"));
+          }
+        },
+        codeSent: (String verificationId, int? resendToken)  async {
+        //release a state that will show the code input field
+           emit(CodeSent(verificationId: verificationId));
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+        timeout: Duration(seconds: 60),
+      );
   }
+
+
   Future<FutureOr<void>> addGuest(AddGuest event, Emitter<LoginState> emit) async {
       String message = await AuthRepo.addGuest();
       if (message == "Login Success") {
@@ -55,5 +75,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     else{
       emit(LoginPageButtonEnabled(isButtonEnabled: false));
     }
+  }
+
+  Future<FutureOr<void>> verifyCode(VerifyCode event, Emitter<LoginState> emit) async {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: event.verificationId, smsCode: event.code);
+    //create phone user in the firebase if first time login 
+    // else login the user
+    await AuthRepo.signUpWithPhone(credential).then((value) => {
+      if(value == "Login Success"){
+        emit(CodeVerified(message: "Code Verified"))
+      }else{
+        emit(CodeFailed(message: "Code Verification Failed"))
+      }
+    });
+  
   }
 }

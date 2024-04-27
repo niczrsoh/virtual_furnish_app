@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:virtual_furnish_app/core/helpers/auth_provider.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/user_repo.dart';
 
@@ -25,9 +27,26 @@ class AuthRepo {
   static Future<String> registerWithEmailandPassword(
       String email, String password) async {
     try {
+     
       UserCredential credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       if (credential.user != null) {}
+      return "Register Success";
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  //register seller with email and password
+    static Future<String> registerSellerWithEmailandPassword(
+      String email, String password) async {
+    try {
+     FirebaseApp app = await Firebase.initializeApp(
+          name: 'Secondary', options: Firebase.app().options);
+      var result = await FirebaseAuth.instanceFor(app: app)
+          .createUserWithEmailAndPassword(
+              email: email, password: password!);
+      if (result != null) {}
       return "Register Success";
     } catch (e) {
       return e.toString();
@@ -86,7 +105,8 @@ class AuthRepo {
           sell: "",
           deliveredAddress: [],
           contact: "",
-          status: ""
+          status: "User",
+          age: 0
         );
         UserRepo.saveUser(userModel);
       }
@@ -99,29 +119,31 @@ class AuthRepo {
       return e.toString();
     }
   }
-
-//login with phone using firebase auth
-  static Future<String?> signInWithPhone(String phoneNo) async {
-    String? id;
-    FirebaseAuth auth = FirebaseAuth.instance;
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      timeout: const Duration(seconds: 120),
-      phoneNumber: phoneNo,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await auth.signInWithCredential(credential).then((value) {
-          id = value.toString();
-          print("You are logged in successfully");
-          return id;
-        });
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        print(e.message);
-      },
-      codeSent: (String verificationId, [int? forceResendingToken]) async {
-        print('verificationId: $verificationId');
-        print('forceResendingToken: $forceResendingToken');
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
+  
+//signin & signup with phone using firebase auth
+  static Future<String?> signUpWithPhone(PhoneAuthCredential credential) async {
+    try{
+  UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+  if(userCredential!=null){
+  if (userCredential.additionalUserInfo!.isNewUser == true) {
+    UserModel userModel = UserModel(
+      id: userCredential.user!.uid,
+      username: userCredential.user!.phoneNumber,
+      email:  "",
+      profilePic:  "",
+      sell: "",
+      deliveredAddress: [],
+      contact: userCredential.user!.phoneNumber,
+      status: "User",
+      age: 0
     );
-  }
-}
+    await UserRepo.saveUser(userModel);
+    return "Login Success";
+  }else{
+  return "Login Success";}}
+  else{
+    return "Login Failed";
+  }}catch(e){
+      return e.toString();
+    }
+}}

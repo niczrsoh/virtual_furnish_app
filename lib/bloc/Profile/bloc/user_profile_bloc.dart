@@ -18,12 +18,11 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   }
 
   FutureOr<void> userProfileEventButtonEnabled(UserProfileEventButtonEnabled event, Emitter<UserProfileState> emit) {
-    UserProfileFound profileState = state as UserProfileFound;
     if(event.isButtonEnabled){
-     emit(UserProfileButtonEnabled(isButtonEnabled: true, userProfileFound: profileState));
+     emit(UserProfileButtonEnabled(isButtonEnabled: true));
      }
     else{
-     emit(UserProfileButtonEnabled(isButtonEnabled: false, userProfileFound: profileState));
+     emit(UserProfileButtonEnabled(isButtonEnabled: false));
     }
   }
 
@@ -33,7 +32,7 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     if(id!=null){
     userModel = await UserRepo.getUser(id);
     if(userModel!=null){
-      emit(UserProfileFound(userModel: userModel));
+      emit(UserProfileFound(userModel: userModel , isGuest: userModel.status=="Guest"));
     }
     else{
       emit(UserProfileError(errorMessage: "User not found"));

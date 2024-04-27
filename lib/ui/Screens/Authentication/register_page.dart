@@ -50,7 +50,7 @@ class RegisterPage extends StatelessWidget {
           listener: (context, state) {
             if (state is RegisterSuccess) {
               CustomSnackbar.showSuccessSnackbar(context, state.message);
-              Navigator.pushNamed(context, '/login');
+              Navigator.pop(context);
               registerBloc.add(const RegisterPageEnableButton(isButtonEnabled: true));
             } else if (state is RegisterFail) {
               CustomSnackbar.showFailSnackbar(context, state.message);

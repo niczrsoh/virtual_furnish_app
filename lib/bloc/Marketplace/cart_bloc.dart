@@ -24,23 +24,39 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<CartProductPageButtonPressed> (cartProductPageButtonPressed);
   }
   double totalPrice = 0;
-  FutureOr<void> addToCart(AddToCart event, Emitter<CartState> emit) {
+  FutureOr<void> addToCart(AddToCart event, Emitter<CartState> emit) async {
     //add into cart
     CartProductModel cartProduct = CartProductModel(productID: event.productID,amount: event.amount,priority: event.priority);
-    CartProductRepo.addProductToCart(cartProduct).then((value) {
+    String value  = await CartProductRepo.addProductToCart(cartProduct);
+    if(value == "Cart Product Added"){
       emit(CartProductAdded());
-    }).catchError((e) {
-      emit(CartError(e.toString()));
-    });
+    }else {
+      emit(CartError("Fail to add"));
+    };
   }
 
-  FutureOr<void> removeFromCart(RemoveFromCart event, Emitter<CartState> emit) {
-
-  }
+  FutureOr<void> removeFromCart(RemoveFromCart event, Emitter<CartState> emit) async {
+    //remove from cart
+    CartProductModel cartProduct = CartProductModel(id: event.productID);
+    String value = await CartProductRepo.removeProductFromCart(cartProduct);
+      if(value == "Successfully Removed"){
+        //remove item from selected cart products if have
+      if(state.selectedCartProducts!.isNotEmpty){
+        state.selectedCartProducts!.removeWhere((element) => element.id == event.productID);}
+        add(LoadCart());
+      }
+      else{
+        emit(CartError(value));
+      }
+    }
 
   FutureOr<void> updateCartProduct(UpdateCartProduct event, Emitter<CartState> emit) async {
     CartProductModel cartProduct = CartProductModel(id: event.id,amount: event.amount,priority: event.priority);
       int indexOfUpdatedProduct = state.cartProducts!.indexWhere((product) => product.id == event.id);
+    if (event.amount == 0){
+       add(RemoveFromCart(event.id));
+       return;
+    }
     if (indexOfUpdatedProduct != -1) {
       // Create a copy of the current products list
       List<CartProductModel>? updatedProducts = state.cartProducts;

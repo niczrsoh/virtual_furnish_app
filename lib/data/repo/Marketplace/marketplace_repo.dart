@@ -3,13 +3,40 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/model/MarketplaceProduct/product_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/user_repo.dart';
 import 'package:virtual_furnish_app/data/repo/firebaseStorageRepo.dart';
 
 class MarketplaceRepo{
 
    static final CollectionReference _productCollection = FirebaseFirestore.instance.collection("MarketplaceProduct");
+
+
+   //increase current buyer to 1 and deduct the amount
+  static Future<String> buyProduct(String id, int amount) async {
+    try{
+      //get the product details
+      DocumentSnapshot documentSnapshot = await _productCollection.doc(id).get();
+      MarketplaceProductModel productModel = MarketplaceProductModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      //deduct the amount
+      int newAmount = productModel.amount! - amount;
+      //increase the buyer
+      int newBuyer = productModel.buyers! + 1;
+      //update the product
+      _productCollection.doc(id).update({
+        "amount": newAmount,
+        "buyers": newBuyer,
+      });
+      return "Product Bought";
+    }
+    catch(e){
+      return e.toString();
+    }
+  }
+
   //add new product using the product model
   static Future<String> addProduct ( MarketplaceProductModel productModel) async {
     try{
@@ -36,7 +63,36 @@ class MarketplaceRepo{
       return e.toString();
     }
   }
-
+  //get products filtered with highest buyers
+  static Future<List<MarketplaceProductModel>> getMostSellingItems() async {
+    try{
+      //need to filter to make sure is not your items
+    String? id = AuthRepo.getCurrentUserId();
+    //get seller id 
+    UserModel userId = await UserRepo.getUser(id!);
+     QuerySnapshot querySnapshot;
+      if(userId.sell!=null && userId.sell!.isNotEmpty){
+        querySnapshot = await _productCollection
+      .where("sellerID", isNotEqualTo: userId.sell).get();
+      }else{
+        querySnapshot = await _productCollection.get();
+      }
+      // .where("sellerId", isNotEqualTo: id)
+      if(querySnapshot.docs.isNotEmpty){  
+      //order the sequence descendingly 
+      querySnapshot.docs.sort((a, b) => b["buyers"].compareTo(a["buyers"]));
+      }
+    return querySnapshot.docs.map((e){ 
+     MarketplaceProductModel model =  MarketplaceProductModel.fromJson(e.data() as Map<String, dynamic>);
+   
+     model.id = e.id;
+     return model;
+     }).toList();
+    }
+    catch(e){
+      throw e;
+    }
+  }
   //get product using the product id
   static Future<MarketplaceProductModel> getSellingItem(String id) async {
     try{
@@ -90,23 +146,22 @@ class MarketplaceRepo{
     }
   }
   //edit product profile
-  static Future<String> editMarketplaceProduct(MarketplaceProductModel productModel) async {
+  static Future<String> editMarketplaceProduct(String id, String type, String value) async {
     try{
-      // if(productModel.images!=null && !productModel.profilePic!.contains("https:/")){
+      // if(type=="images"){
       // String url = await FirebaseStorageRepo.uploadFile(path: productModel.profilePic!, category: "Profile");
       // productModel.profilePic = url;}
-      // String uid = AuthRepo.getCurrentMarketplaceProductId()!;
-      // print(productModel.toJson());
-      // Map updatedData = {
-      //   "productname": productModel.productname,
-      //   "email": productModel.email,
-      //   "age": productModel.age,
-      //   "profile_pic": productModel.profilePic,
-      //   "contact": productModel.contact,
-      //   "status": productModel.status
-      // };
-      // _productCollection.doc(uid).update(Map<String, dynamic>.from(updatedData));
-      return "MarketplaceProduct Updated";
+      type = type.trim();
+      Map updatedData = (type=="Price")?{
+        type.toLowerCase(): double.parse(value),
+      }:(type=="Amount")?{
+        type.toLowerCase(): int.parse(value),
+      }:{
+        type.toLowerCase(): value,
+      };
+      
+      _productCollection.doc(id).update(Map<String, dynamic>.from(updatedData));
+      return value;
     }
     catch(e){
       return e.toString();
@@ -156,7 +211,7 @@ class MarketplaceRepo{
     List<MarketplaceProductModel> filters = [];
     //using for 
     for(DocumentSnapshot doc in querySnapshot.docs){
-      if(doc["name"].toString().toLowerCase() == title.toLowerCase()){
+      if(doc["name"].toString().contains(title.toLowerCase())){
       MarketplaceProductModel model = MarketplaceProductModel.fromJson(doc.data() as Map<String, dynamic>);
        model.id = doc.id;
       filters.add(model);}

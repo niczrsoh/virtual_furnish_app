@@ -1,6 +1,6 @@
 part of 'edit_profile_bloc.dart';
 
-sealed class EditProfileState extends Equatable {
+sealed class EditProfileState extends Equatable{
    EditProfileState();
   @override
   List<Object> get props => [];
@@ -26,18 +26,16 @@ class EditProfileButtonEnabled extends EditProfileState {
 class UserProfileFound extends EditProfileState {
   final UserModel userModel;
   UserProfileFound({required this.userModel});
-  //copyWith
-   UserProfileFound copyWith({
-    UserModel? userModel,
-  }) {
-    return UserProfileFound(
-        userModel: userModel ?? this.userModel,
-      );
-  }
-
-  //add into props
+  // //copyWith
+  //  UserProfileFound copyWith({
+  //   UserModel? userModel,
+  // }) {
+  //   return UserProfileFound(
+  //       userModel: userModel ?? this.userModel,
+  //     );
+  // }
   @override
-  List<Object> get props => [];
+  List<Object> get props => [userModel];
 }
 
 class UserProfileError extends EditProfileState {

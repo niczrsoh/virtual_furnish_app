@@ -28,7 +28,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
           age: 0,
           deliveredAddress: [],
           contact: "",
-          status: "Active",
+          status: "User",
         );
         final value = await UserRepo.saveUser(userModel);
         if (value == "User Added") {

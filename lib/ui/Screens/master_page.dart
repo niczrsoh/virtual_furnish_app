@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Marketplace/marketplace_bloc.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR Space/augmented_reality_space_page.dart';
 import 'package:virtual_furnish_app/bloc/Master/master_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/seller_profile_bloc.dart';
@@ -35,38 +36,38 @@ List<BottomNavigationBarItem> sellerBottomNavBars =
   BottomNavigationBarItem(icon: Icon(Icons.person), label: 'profile'),
 ];
 int tabIndex = 0;
-final UserProfileBloc userProfileBloc = UserProfileBloc();
-final SellerProfileBloc sellerProfileBloc = SellerProfileBloc();
-final CartBloc cartBloc = CartBloc()..add(LoadCart());
-final CreateSellingItemBloc createSellingItemBloc = CreateSellingItemBloc();
-final SoldListBloc soldListBloc = SoldListBloc()..add(SoldListDataFetched());
-List userBloc = [
-  userProfileBloc,
-];
-List sellerBloc = [
-  sellerProfileBloc,
-];
+ UserProfileBloc userProfileBloc = UserProfileBloc()..add(UserProfileFetched());
+ SellerProfileBloc sellerProfileBloc = SellerProfileBloc();
+ CartBloc cartBloc = CartBloc()..add(LoadCart());
+ CreateSellingItemBloc createSellingItemBloc = CreateSellingItemBloc();
+ SoldListBloc soldListBloc = SoldListBloc()..add(SoldListDataFetched());
+ MarketplaceBloc marketplaceBloc = MarketplaceBloc()..add(FetchMostSellingItems());
 List<Widget> bottomNavScreen = [
-  MarketplacePage(),
+  BlocProvider<MarketplaceBloc>.value(
+    value: marketplaceBloc,
+    child: MarketplacePage(marketplaceBloc: marketplaceBloc),
+  ),
   BlocProvider<CartBloc>.value(
     value: cartBloc,
     child: CartProductPage(cartBloc: cartBloc),
   ),
   ARSpacePage(),
   Text('index 3: message'),
-   BlocProvider<UserProfileBloc>.value(
+  BlocProvider<UserProfileBloc>.value(
     value: userProfileBloc,
     child: UserProfilePage(userProfileBloc: userProfileBloc),
   )
 ];
 List<Widget> sellerBottomNavScreen = [
-   BlocProvider<SoldListBloc>.value(
+  BlocProvider<SoldListBloc>.value(
     value: soldListBloc,
-    child: SoldListPage(soldListBloc: soldListBloc,),
+    child: SoldListPage(
+      soldListBloc: soldListBloc,
+    ),
   ),
   RunningDotsLoader(),
- // Text('index 1: cart'),
-    BlocProvider<CreateSellingItemBloc>.value(
+  // Text('index 1: cart'),
+  BlocProvider<CreateSellingItemBloc>.value(
     value: createSellingItemBloc,
     child: CreateSellingItemPage(createSellingItemBloc: createSellingItemBloc),
   ),
@@ -88,27 +89,32 @@ class MasterPage extends StatefulWidget {
 class _MasterPageState extends State<MasterPage> {
   @override
   Widget build(BuildContext context) {
+    
     return BlocConsumer<MasterBloc, MasterState>(
       listener: (context, state) {},
       builder: (context, state) {
         if (state is MasterUserDataFetched || state is MasterTabChanged) {
+          if(state.userType != "seller" && state.tabIndex == 0){
+            marketplaceBloc.add(FetchMostSellingItems());
+          }
           return Scaffold(
             body: Center(
-              child: state.userType == "seller"
-                      ? sellerBottomNavScreen.elementAt(tabIndex)
-                      : bottomNavScreen.elementAt(tabIndex)),
+                child: state.userType == "seller"
+                    ? sellerBottomNavScreen.elementAt(state.tabIndex)
+                    : bottomNavScreen.elementAt(state.tabIndex)),
             bottomNavigationBar: BottomNavigationBar(
               items: state.userType == "seller"
                   ? sellerBottomNavBars
                   : bottomNavBars,
               selectedItemColor: Colors.teal,
               unselectedItemColor: Colors.grey,
-              currentIndex: tabIndex,
+              currentIndex: state.tabIndex,
               onTap: (index) {
-                setState(() {
-                  tabIndex = index;
-                });
-             //   widget.bloc.add(TabChange(tabIndex: index));
+                if(state.userType != "seller" && index == 1){
+                    cartBloc.add(LoadCart());
+                }else if(state.userType != "seller" && index == 4){
+                    userProfileBloc.add(UserProfileFetched());}
+                   widget.bloc.add(TabChange(tabIndex: index));
               },
             ),
           );

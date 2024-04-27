@@ -9,7 +9,7 @@ import 'package:virtual_furnish_app/data/repo/Marketplace/checkout_payment_repo.
 import 'package:virtual_furnish_app/data/repo/Marketplace/marketplace_repo.dart';
 
 part 'checkout_event.dart';
-part 'checkout_state.dart';
+part 'checkout_state.dart';    
 
 class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   CheckoutBloc() : super(CheckoutInitial()) {

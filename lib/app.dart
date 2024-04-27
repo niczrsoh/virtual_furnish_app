@@ -26,8 +26,8 @@ class App extends StatelessWidget {
         appBarTheme: AppBarTheme(
           backgroundColor: CustomColor.primaryBackgroundColor,
           elevation: 0.0,
-          iconTheme: IconThemeData(color: Colors.black),
-          titleTextStyle: TextStyle(
+          iconTheme: const IconThemeData(color: Colors.black),
+          titleTextStyle: const TextStyle(
               color: Colors.black,
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
@@ -41,16 +41,16 @@ class App extends StatelessWidget {
           ),
           scaffoldBackgroundColor: CustomColor.primaryBackgroundColor,
           inputDecorationTheme: InputDecorationTheme(
-            labelStyle: TextStyle(color: Colors.black),
+            labelStyle: const TextStyle(color: Colors.black),
             fillColor: CustomColor.primaryBackgroundColor,
             filled: true,
-            border: OutlineInputBorder(
+            border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey),
             ),
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.grey),
             ),
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.teal),
             ),
           ),

@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:virtual_furnish_app/bloc/Authentication/Login/login_bloc.dart';
 import 'package:virtual_furnish_app/main.dart';
+import 'package:virtual_furnish_app/ui/Screens/master_page.dart';
+import 'package:virtual_furnish_app/ui/Widgets/custom_button.dart';
+import 'package:virtual_furnish_app/ui/Widgets/custom_snackbar.dart';
 
 class OtpVerificationPage extends StatefulWidget {
-  const OtpVerificationPage({super.key});
-
+  const OtpVerificationPage(
+      {super.key,
+      required this.loginBloc,
+      required this.verificationId,
+      });
+  final LoginBloc loginBloc;
+  final String verificationId;
   @override
   State<OtpVerificationPage> createState() => _OtpVerificationPageState();
 }
@@ -59,11 +69,13 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                             height: 68,
                             width: mq.width * 0.12,
                             child: TextField(
-                              onChanged: (value){
+                              onChanged: (value) {
                                 checkButtonStatus();
-                                if(value.length == 1) FocusScope.of(context).nextFocus();
+                                if (value.length == 1)
+                                  FocusScope.of(context).nextFocus();
                               },
-                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              onEditingComplete: () =>
+                                  FocusScope.of(context).nextFocus(),
                               controller: otp1,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
@@ -76,11 +88,13 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                             height: 68,
                             width: mq.width * 0.12,
                             child: TextField(
-                                   onChanged: (value){
+                              onChanged: (value) {
                                 checkButtonStatus();
-                                if(value.length == 1) FocusScope.of(context).nextFocus();
+                                if (value.length == 1)
+                                  FocusScope.of(context).nextFocus();
                               },
-                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              onEditingComplete: () =>
+                                  FocusScope.of(context).nextFocus(),
                               controller: otp2,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
@@ -93,11 +107,13 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                             height: 68,
                             width: mq.width * 0.12,
                             child: TextField(
-                                 onChanged: (value){
+                              onChanged: (value) {
                                 checkButtonStatus();
-                                if(value.length == 1) FocusScope.of(context).nextFocus();
+                                if (value.length == 1)
+                                  FocusScope.of(context).nextFocus();
                               },
-                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              onEditingComplete: () =>
+                                  FocusScope.of(context).nextFocus(),
                               controller: otp3,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
@@ -110,11 +126,13 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                             height: 68,
                             width: mq.width * 0.12,
                             child: TextField(
-                              onChanged: (value){
+                              onChanged: (value) {
                                 checkButtonStatus();
-                                if(value.length == 1) FocusScope.of(context).nextFocus();
+                                if (value.length == 1)
+                                  FocusScope.of(context).nextFocus();
                               },
-                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              onEditingComplete: () =>
+                                  FocusScope.of(context).nextFocus(),
                               controller: otp4,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
@@ -123,15 +141,17 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                 FilteringTextInputFormatter.digitsOnly
                               ],
                             )),
-                         SizedBox(
+                        SizedBox(
                             height: 68,
                             width: mq.width * 0.12,
                             child: TextField(
-                              onChanged: (value){
+                              onChanged: (value) {
                                 checkButtonStatus();
-                                if(value.length == 1) FocusScope.of(context).nextFocus();
+                                if (value.length == 1)
+                                  FocusScope.of(context).nextFocus();
                               },
-                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              onEditingComplete: () =>
+                                  FocusScope.of(context).nextFocus(),
                               controller: otp5,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
@@ -140,15 +160,17 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                                 FilteringTextInputFormatter.digitsOnly
                               ],
                             )),
-                         SizedBox(
+                        SizedBox(
                             height: 68,
                             width: mq.width * 0.12,
                             child: TextField(
-                              onChanged: (value){
+                              onChanged: (value) {
                                 checkButtonStatus();
-                                if(value.length == 1) FocusScope.of(context).nextFocus();
+                                if (value.length == 1)
+                                  FocusScope.of(context).nextFocus();
                               },
-                              onEditingComplete: () => FocusScope.of(context).nextFocus(),
+                              onEditingComplete: () =>
+                                  FocusScope.of(context).nextFocus(),
                               controller: otp6,
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
@@ -160,32 +182,41 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                       ],
                     )),
                     const SizedBox(height: 50),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: (!isDisabledButton)
-                                ? Colors.blue : Colors.grey,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                          fixedSize: const Size(340, 45),
-                        ),
-                        onPressed: () {
-                           if(!isDisabledButton){
+                    BlocListener<LoginBloc, LoginState>(
+                      bloc: widget.loginBloc,
+                      listener: (context, state) {
+                        // TODO: implement listener
+                        if (state is CodeVerified) {
+                          CustomSnackbar.showSuccessSnackbar(context, "Code Verified");
+                          //pop until login page
+                          Navigator.popUntil(context, ModalRoute.withName('/login'));
+                          //push to master page
+                          Navigator.pushNamed(context, '/master');
+                        }
+                      },
+                      child: CustomButton(
+                          isDisabled: isDisabledButton,
+                          onPressed: () {
+                            if (!isDisabledButton) {
+                              widget.loginBloc.add(VerifyCode(
+                                  verificationId: widget.verificationId,
+                                  code: otp1.text +
+                                      otp2.text +
+                                      otp3.text +
+                                      otp4.text +
+                                      otp5.text +
+                                      otp6.text));
                               setState(() {
-                              isDisabledButton = true;
+                                isDisabledButton = true;
                               });
-                          Navigator.of(context)
-                              .pushNamed('/home');
-                          }
-                        },
-                        child: Text(
-                          'Verify OTP',
-                          style: TextStyle(
-                              color: Colors.grey, fontSize: 18),
-                        )),
+                              Navigator.of(context).pushNamed('/home');
+                            }
+                          },
+                          buttonText: 'Verify OTP',
+                    ),),
                     const SizedBox(
                       height: 60,
                     ),
-                  
                   ]),
             ),
           ),
@@ -193,8 +224,12 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       ),
     );
   }
+
   void checkButtonStatus() {
-    if (otp1.text.trim().isNotEmpty && otp2.text.trim().isNotEmpty && otp3.text.trim().isNotEmpty && otp4.text.trim().isNotEmpty) {
+    if (otp1.text.trim().isNotEmpty &&
+        otp2.text.trim().isNotEmpty &&
+        otp3.text.trim().isNotEmpty &&
+        otp4.text.trim().isNotEmpty) {
       setState(() {
         isDisabledButton = false;
       });

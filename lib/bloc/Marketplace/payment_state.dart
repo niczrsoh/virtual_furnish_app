@@ -1,10 +1,27 @@
 part of 'payment_bloc.dart';
 
-sealed class PaymentState extends Equatable {
-  const PaymentState();
-  
-  @override
-  List<Object> get props => [];
-}
+enum PaymentStatus { initial, loading, success, failure }
 
-final class PaymentInitial extends PaymentState {}
+class PaymentState extends Equatable {
+  final PaymentStatus status;
+  final CardFieldInputDetails cardFieldInputDetails;
+  const PaymentState(
+      {this.status = PaymentStatus.initial,
+      this.cardFieldInputDetails =
+          const CardFieldInputDetails(complete: false)});
+
+  //generate copy with
+  PaymentState copyWith({
+    PaymentStatus? status,
+    CardFieldInputDetails? cardFieldInputDetails,
+  }) {
+    return PaymentState(
+      status: status ?? this.status,
+      cardFieldInputDetails:
+          cardFieldInputDetails ?? this.cardFieldInputDetails,
+    );
+  }
+
+  @override
+  List<Object> get props => [status, cardFieldInputDetails];
+}

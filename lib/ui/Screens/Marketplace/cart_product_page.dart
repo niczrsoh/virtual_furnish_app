@@ -61,9 +61,10 @@ class CartProductPage extends StatelessWidget {
                     children: [
                       Text('Total Amount:'),
                       BlocBuilder<CartBloc, CartState>(
+                        bloc: cartBloc,
                         builder: (context, state) {
                           return Text(
-                            "RM ${state.totalPrice!.toStringAsFixed(2)}",
+                          (state.totalPrice!=null)?"RM ${state.totalPrice!.toStringAsFixed(2)}":"",
                             style: TextStyle(
                                 color: CustomColor.priceTagColor,
                                 fontWeight: FontWeight.bold),
@@ -87,12 +88,15 @@ class CartProductPage extends StatelessWidget {
                       width: mq.width * 0.35,
                       buttonText: 'Checkout',
                       isDisabled: isButtonDisabled,
-                      onPressed: () {
+                      onPressed: () async {
                         if (!isButtonDisabled) {
                           // Add your code here
-                          Navigator.pushNamed(context, '/checkout', arguments: {
+                          var result = await Navigator.pushNamed(context, '/checkout', arguments: {
                             'cartList': state.selectedCartProducts, 
                           });
+                          if (result != null) {
+                            cartBloc.add(LoadCart());
+                          }
                         }
                       },
                     );
@@ -109,6 +113,7 @@ class CartProductPage extends StatelessWidget {
               case CartListFetchedSuccess ||
                     CartProductUpdated || 
                     CartProductSelected ||
+                    CartProductRemoved || 
                     CartProductPageButtonState:
                 final currentState;
                 if (state is CartListFetchedSuccess) {
@@ -117,6 +122,8 @@ class CartProductPage extends StatelessWidget {
                   currentState = state as CartProductUpdated;
                 } else if (state is CartProductSelected) {
                   currentState = state as CartProductSelected;
+                } else if (state is CartProductRemoved){
+                  currentState = state as CartProductRemoved;
                 } else{
                   currentState = state as CartProductPageButtonState;
                 }

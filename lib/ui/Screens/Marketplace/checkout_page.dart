@@ -23,12 +23,21 @@ class CheckoutPage extends StatelessWidget {
                 color: CustomColor.primaryBackgroundColor,
               ),
               padding: PaddingStyles.paddingStyle1,
-              child: CustomButton(
-                buttonText: 'Place Order',
-                onPressed: () {
-                  Navigator.pushNamed(context, '/payment');},
-                isDisabled: false,
-                      ),
+              child: BlocBuilder<CheckoutBloc, CheckoutState>(
+                bloc: checkoutBloc,
+                buildWhen: (previous, current) => current is CheckoutLoaded,
+                builder: (context, state) {
+                  if(state is CheckoutInitial) return CircularProgressIndicator();
+                  state as CheckoutLoaded;
+                  return CustomButton(
+                              buttonText: 'Place Order',
+                              onPressed: () {
+                                //need to pass total amount charged for each shop and the total amount charge to user to the payment page
+                                Navigator.pushNamed(context, '/payment', arguments: {'cartProducts': state.cartProducts, 'total': state.totalPayment});},
+                                isDisabled: false,
+                                    );
+                },
+              ),
             ),
         body: SingleChildScrollView(
           child: Padding(
@@ -40,6 +49,8 @@ class CheckoutPage extends StatelessWidget {
               },
               builder: (context, state) {
                 switch (state.runtimeType) {
+                  case CheckoutInitial:
+                    return Center(child: CircularProgressIndicator());
                   case CheckoutLoading:
                     return Center(child: CircularProgressIndicator());
                   case CheckoutError:

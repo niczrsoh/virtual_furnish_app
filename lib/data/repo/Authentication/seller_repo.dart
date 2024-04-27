@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/sell_account_model.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/user_repo.dart';
 import 'package:virtual_furnish_app/data/repo/firebaseStorageRepo.dart';
 
 class SellerRepo{
@@ -30,14 +31,28 @@ class SellerRepo{
   //add new user using the user model
   static Future<String> addSellRegister(SellerAccountModel sellerAccountModel) async {
     try{
+      //get current user acc
+      String uid = AuthRepo.getCurrentUserId()!;
       _sellerCollection.doc(sellerAccountModel.id).set(sellerAccountModel.toJson());
-      _userCollection.doc(sellerAccountModel.id).set(UserModel(
-        sell: sellerAccountModel.id,
-      ).toJson());
+      _userCollection.doc(uid).update({"sell": sellerAccountModel.id});
       return "Seller Registered";
     }
-    catch(e){
+    catch(e){  
       return e.toString();
+    }
+  }
+  //get registered store 
+  static Future<SellerAccountModel> getRegisteredShop() async {
+    try{
+      String userId = AuthRepo.getCurrentUserId()!;
+      UserModel userModel = await UserRepo.getUser(userId);
+      if(userModel.sell!.isEmpty) return SellerAccountModel();
+      String sellId = userModel.sell!;
+      DocumentSnapshot document = await _sellerCollection.doc(sellId).get();
+      return document.exists ? SellerAccountModel.fromJson(document.data() as Map<String, dynamic>) : SellerAccountModel();
+    }
+    catch(e){
+      throw e;
     }
   }
   //get user using the user id

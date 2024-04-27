@@ -4,8 +4,8 @@ import 'package:flutter_unity_widget/flutter_unity_widget.dart';
 
 
 class ARSpacePage extends StatefulWidget {
-  const ARSpacePage({Key? key}) : super(key: key);
-
+  ARSpacePage({Key? key, this.itemId}) : super(key: key);
+  String? itemId;
   @override
   State<ARSpacePage> createState() => _ARSpacePageState();
 }
@@ -26,9 +26,6 @@ class _ARSpacePageState extends State<ARSpacePage> {
     return MaterialApp(
       home: Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(
-          title: const Text('Unity Flutter Demo'),
-        ),
         body: Card(
           margin: const EdgeInsets.all(8),
           clipBehavior: Clip.antiAlias,

@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/sold_list_bloc.dart';
 import 'package:virtual_furnish_app/main.dart';
@@ -12,7 +13,7 @@ import 'package:virtual_furnish_app/ui/Widgets/secondary_custom_button.dart';
 import 'package:virtual_furnish_app/ui/Widgets/video_player_widget.dart';
 
 class SoldListPage extends StatelessWidget {
-  const SoldListPage({super.key,required this.soldListBloc});
+  const SoldListPage({super.key, required this.soldListBloc});
   final SoldListBloc soldListBloc;
   static final List<Entry> data = [];
   // <Entry>[
@@ -38,68 +39,108 @@ class SoldListPage extends StatelessWidget {
   // ];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Sold List'),
-      ),
-      body: BlocConsumer<SoldListBloc, SoldListState>(
-        listener: (context, state) {
-          if (state is DeleteItemSuccess) {
-            CustomSnackbar.showSuccessSnackbar(context, 'Item Deleted');
-          } else if (state is DeleteItemFail) {
-            CustomSnackbar.showFailSnackbar(context, 'Failed to delete item');
-          }
+    return RefreshIndicator(
+      onRefresh: () async {
+        soldListBloc.add(SoldListDataFetched());
+      },
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
         },
-        builder: (context, state) {
-          switch (state.runtimeType) {
-            case SoldListFetctedLoading:
-              return const Center(child: CircularProgressIndicator());
-            case SoldListDataFetchedByNameSuccess:
-             SoldListDataFetchedByNameSuccess cuurentState = state as SoldListDataFetchedByNameSuccess;
-              return Center(
-            child: ListView.builder(
-              itemCount: cuurentState.soldListData.length,
-              itemBuilder: (BuildContext context, int index) {
-                //add into data list
-                for (int i = 0; i < cuurentState.soldListData.length; i++) {
-                  data.add(Entry(cuurentState.soldListData[i].name.toString(), <Entry>[
-                    //array of images
-                    Entry("images",<Entry>[
-                      if(cuurentState.soldListData[i].video!=null)
-                      Entry(cuurentState.soldListData[i].video!.toString()),
-                     for(int j=0;j<cuurentState.soldListData[i].images!.length;j++)
-                      Entry(cuurentState.soldListData[i].images![j].toString())
-                    ]),
-                    Entry("Price : RM${cuurentState.soldListData[i].price.toString()}"),
-                    Entry("Amount : ${cuurentState.soldListData[i].amount.toString()}"),
-                    Entry("Description: ${cuurentState.soldListData[i].description.toString()}"),
-                    Entry("Category: ${cuurentState.soldListData[i].category.toString()}"),
-                    Entry("Location: ${cuurentState.soldListData[i].location.toString()}"),
-                    (cuurentState.soldListData[i].threeDimensionModel!=null)?Entry("3D Model: ${cuurentState.soldListData[i].threeDimensionModel!.toString()}"):Entry("3D Model: Not Available"),
-                  ]));
-                }
-                return EntryItem(data[index], context, soldListBloc, cuurentState.soldListData[index].id.toString());
-              },
-            ),
-          );
-            case SoldListFetctedFail:
-              return const Text('Failed to fetch data');
-            default:
-              return const Center(child: CircularProgressIndicator());
-          }
-        },
+        child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text('Sold List'),
+          ),
+          body: BlocConsumer<SoldListBloc, SoldListState>(
+            //build when is not action state
+            buildWhen: (previous, current) => current is! SoldListActionState && current is! SoldListConditionState,
+            //listener when is action state
+            listenWhen: (previous, current) => current is SoldListActionState,
+            bloc: soldListBloc,
+            listener: (context, state) {
+              if (state is DeleteItemSuccess) {
+                Navigator.pop(context);
+                CustomSnackbar.showSuccessSnackbar(context, 'Item Deleted');
+              } else if (state is DeleteItemFail) {
+                Navigator.pop(context);
+                CustomSnackbar.showFailSnackbar(context, 'Failed to delete item');
+              }
+            },
+            builder: (context, state) {
+              switch (state.runtimeType) {
+                case SoldListFetctedLoading:
+                  return const Center(child: CircularProgressIndicator());
+                case SoldListDataFetchedByNameSuccess:
+                  SoldListDataFetchedByNameSuccess cuurentState =
+                      state as SoldListDataFetchedByNameSuccess;
+                  return Center(
+                    child: ListView.builder(
+                      itemCount: cuurentState.soldListData.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        //add into data list
+                        for (int i = 0;
+                            i < cuurentState.soldListData.length;
+                            i++) {
+                          data.add(Entry(
+                              cuurentState.soldListData[i].name.toString(),
+                              <Entry>[
+                                //array of images
+                                Entry("images", <Entry>[
+                                  if (cuurentState.soldListData[i].video != null)
+                                    Entry(cuurentState.soldListData[i].video!
+                                        .toString()),
+                                  for (int j = 0;
+                                      j <
+                                          cuurentState
+                                              .soldListData[i].images!.length;
+                                      j++)
+                                    Entry(cuurentState.soldListData[i].images![j]
+                                        .toString())
+                                ]),
+                                Entry(
+                                    "Price : RM${cuurentState.soldListData[i].price.toString()}"),
+                                Entry(
+                                    "Amount : ${cuurentState.soldListData[i].amount.toString()}"),
+                                Entry(
+                                    "Description: ${cuurentState.soldListData[i].description.toString()}"),
+                                Entry(
+                                    "Category: ${cuurentState.soldListData[i].category.toString()}"),
+                                Entry(
+                                    "Location: ${cuurentState.soldListData[i].location.toString()}"),
+                                (cuurentState.soldListData[i]
+                                            .threeDimensionModel !=
+                                        null)
+                                    ? Entry(
+                                        "3D Model: ${cuurentState.soldListData[i].threeDimensionModel!.toString()}")
+                                    : Entry("3D Model: Not Available"),
+                              ]));
+                        }
+                        return EntryItem(data[index], context, soldListBloc,
+                            cuurentState.soldListData[index].id.toString(), index);
+                      },
+                    ),
+                  );
+                case SoldListFetctedFail:
+                  return const Text('Failed to fetch data');
+                default:
+                  return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        ),
       ),
     );
   }
 }
 
 class EntryItem extends StatelessWidget {
-  const EntryItem(this.entry, this.context, this.soldListBloc, this.id);
+  const EntryItem(this.entry, this.context, this.soldListBloc, this.id, this.index);
   final BuildContext context;
   final Entry entry;
   final SoldListBloc soldListBloc;
   final String id;
+  final int index;
   Widget _buildTiles(Entry root) {
     if (root.children.isEmpty) return ListTile(title: Text(root.title));
     return ExpansionTile(
@@ -125,49 +166,90 @@ class EntryItem extends StatelessWidget {
                 });
           },
           icon: Icon(Icons.delete)),
-      children: root.children.map<Widget>(_buildChildrenTiles).toList(),
+      children: [
+        for (int i = 0; i < root.children.length; i++)
+          _buildChildrenTiles(root.children[i], index)
+      ]
     );
   }
 
-  Widget _buildChildrenTiles(Entry root) {
-    if(root.title == "images"){
+  Widget _buildChildrenTiles(Entry root, int index) {
+    if (root.title == "images") {
       debugPrint(root.children.length.toString());
-      for(int i=0;i<root.children.length;i++){
+      for (int i = 0; i < root.children.length; i++) {
         debugPrint('image: ${root.children[i].title}');
       }
     }
     return (root.title == "images")
-        ?  CarouselSlider.builder(
-          key: PageStorageKey('myScrollable'),
-          itemCount: root.children.length, itemBuilder: 
-        (context, index, realIndex) {
-          return (root.children[index].title.contains(".mp4"))?
-          VideoPlayerWidget(videoUrl: root.children[index].title.toString()):Image.network(root.children[index].title.toString(),fit: BoxFit.cover,);}
-        , options: 
-        CarouselOptions(
-          height: 200,
-          aspectRatio: 16/9,
-          viewportFraction: 0.8,
-          initialPage: 0,
-          enableInfiniteScroll: true,
-          reverse: false,
-          autoPlay: true,
-          autoPlayInterval: const Duration(seconds: 6),
-          autoPlayAnimationDuration: const Duration(milliseconds: 800),
-          autoPlayCurve: Curves.fastOutSlowIn,
-          enlargeCenterPage: true,
-          scrollDirection: Axis.horizontal,
-        )):(root.title.contains("3D Model:"))?
-        SecondaryCustomButton(onPressed: (){
-          //Navigate to 3D Model Page
-          Navigator.pushNamed(context, '/3d_model_viewer',arguments: {"path":root.title.replaceAll("3D Model: ","")});
-        }, buttonText: 'View 3D object', isDisabled: false)
-        : GestureDetector(
-            onTap: () {},
-            child: ListTile(
-                trailing: IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
-                title: Text(root.title)));
-        
+        ? CarouselSlider.builder(
+            key: PageStorageKey('myScrollable'),
+            itemCount: root.children.length,
+            itemBuilder: (context, index, realIndex) {
+              return (root.children[index].title.contains(".mp4"))
+                  ? VideoPlayerWidget(
+                      videoUrl: root.children[index].title.toString())
+                  : Image.network(
+                      root.children[index].title.toString(),
+                      fit: BoxFit.cover,
+                    );
+            },
+            options: CarouselOptions(
+              height: 200,
+              aspectRatio: 16 / 9,
+              viewportFraction: 0.8,
+              initialPage: 0,
+              enableInfiniteScroll: true,
+              reverse: false,
+              autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 6),
+              autoPlayAnimationDuration: const Duration(milliseconds: 800),
+              autoPlayCurve: Curves.fastOutSlowIn,
+              enlargeCenterPage: true,
+              scrollDirection: Axis.horizontal,
+            ))
+        : (root.title.contains("3D Model:"))
+            ? SecondaryCustomButton(
+                onPressed: () {
+                  //Navigate to 3D Model Page
+                  Navigator.pushNamed(context, '/3d_model_viewer', arguments: {
+                    "path": root.title.replaceAll("3D Model: ", "")
+                  });
+                },
+                buttonText: 'View 3D object',
+                isDisabled: false)
+            : GestureDetector(
+                onTap: () {},
+                child: BlocBuilder<SoldListBloc, SoldListState>(
+                  bloc: soldListBloc,
+                  buildWhen: (previous, current) => current is RequestEditSuccess || current is UpdateItemSuccess,
+                  builder: (context, state) {
+                    return ListTile(
+                        trailing: IconButton(
+                            onPressed: () {
+                               String type = root.title.split(':').first;
+                              if(state is RequestEditSuccess && state.isEdit){
+                                 soldListBloc.add(RequestEdit(type: type,isEdit: false, index: index));
+                              }else{
+                              soldListBloc.add(RequestEdit(type: type,isEdit: true, index: index));}
+                            },
+                            icon: Icon(Icons.edit)),
+                        title: (state is RequestEditSuccess && state.isEdit && state.type == root.title.split(':').first && index == state.index)
+                            ? TextField(
+                                key: PageStorageKey('myScrollable'),
+                                decoration: InputDecoration(
+                                  prefixIcon: (state.type=="Price")?Text("RM "):null,
+                                  hintText: root.title.split(':').last,
+                                ),
+                                onSubmitted: (value) {
+                                  soldListBloc.add(ProductModification(
+                                      id: id,
+                                      type: state.type,
+                                      index: state.index,
+                                      value: value));
+                                },
+                            ): Text(((state is UpdateItemSuccess && root.title.split(":").first == state.type && index == state.index)?"${state.type}: ${state.value}":root.title)));
+                  },
+                ));
   }
 
   @override

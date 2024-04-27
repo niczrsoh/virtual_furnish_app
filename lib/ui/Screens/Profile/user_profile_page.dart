@@ -16,18 +16,15 @@ class UserProfilePage extends StatelessWidget {
     return Scaffold(
       body: BlocConsumer<UserProfileBloc, UserProfileState>(
         listener: (context, state) {},
+        buildWhen: (previous, current) => current is !UserProfileActionState,
         builder: (context, state) {
-            if(state is UserProfileInitial){
-              userProfileBloc.add(UserProfileFetched());
-              return const Center(child: CircularProgressIndicator());}
-            else if(state is UserProfileFound || state is UserProfileButtonEnabled){
-              final foundState ;
-              if(state is UserProfileButtonEnabled){
-                final buttonState = state as UserProfileButtonEnabled;
-                foundState = buttonState.userProfileFound;}
-              else{
-                foundState = state as UserProfileFound;
-              }
+            // if(state is UserProfileInitial){
+            //   userProfileBloc.add(UserProfileFetched());
+            //   return const Center(child: CircularProgressIndicator());}
+            // else 
+             userProfileBloc.add(UserProfileFetched());
+            if(state is UserProfileFound){
+              final foundState = state as UserProfileFound;
               return FoundWidget(
                   userModel: foundState.userModel,
                   userProfileBloc: userProfileBloc);}
@@ -47,7 +44,10 @@ class UserProfilePage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-                   AuthRepo.logout();
+              AuthRepo.logout();
+              //remove current state
+      //        userProfileBloc.close();
+              //reload the page
               Navigator.pushNamedAndRemoveUntil(
                   context, '/login', (route) => false);
             },
@@ -73,6 +73,7 @@ class FoundWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isButtonEnabled = true;
     return SingleChildScrollView(
         child: Column(
       children: [
@@ -81,20 +82,19 @@ class FoundWidget extends StatelessWidget {
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(userModel.email ?? ""),
+              Text(userModel.email ?? "-"),
               const SizedBox(
                 height: 10,
               ),
-              BlocSelector<UserProfileBloc, UserProfileState, bool>(
+              if(userModel.status!="Guest")
+              BlocBuilder<UserProfileBloc, UserProfileState>(
                 bloc: userProfileBloc,
-                selector: (state){ 
-                  if(state is UserProfileButtonEnabled){
-                  return state.isButtonEnabled;}
-                  else return true;},
-                builder: (context, isButtonEnabled) {
+                buildWhen: (previous, current) => current is UserProfileActionState,
+                builder: (context, state) {
                   return CustomButton(
                       onPressed: () async {
-                        if(isButtonEnabled){
+                        if(isButtonEnabled || (state is UserProfileButtonEnabled && state.isButtonEnabled)){
+                          isButtonEnabled = false;
                         userProfileBloc.add(const UserProfileEventButtonEnabled(isButtonEnabled: false));
                         var result =
                             await Navigator.pushNamed(context, '/edit_profile');
@@ -104,25 +104,24 @@ class FoundWidget extends StatelessWidget {
                         }}
                       },
                       buttonText: 'Edit Profile',
-                      isDisabled: !isButtonEnabled);
+                      isDisabled: (state is UserProfileButtonEnabled)?!state.isButtonEnabled:!isButtonEnabled);
                 },
               )
             ],
           ),
           leading: CircleAvatar(
             radius: 30,
-            backgroundImage: Image.network(userModel.profilePic ??
-                    "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?size=338&ext=jpg&ga=GA1.1.1700460183.1708646400&semt=ais")
-                .image,
+            backgroundImage: (userModel.profilePic!=null&&userModel.profilePic!="")?Image.network(userModel.profilePic!).image:Image.asset('assets/images/profilepic-anonymous.jpg').image,
           ),
         ),
+        if(userModel.status!="Guest")...[
         ListProfileTile(
             title: "My Orders", subtitle: "already have 0 order", onTap: () {}),
         ListProfileTile(
             title: "Shipping Address", subtitle: "3 address", onTap: () {}),
         ListProfileTile(
-            title: "Seller Registration", subtitle: "Pending", onTap: () async {
-              var result = await Navigator.pushNamed(context, '/seller_register');
+            title: "Seller Registration", subtitle: (userModel.sell!=null&&userModel.sell!.isNotEmpty)?"1 shop":"0 shop", onTap: () async {
+              var result = await Navigator.pushNamed(context, '/seller_register_list');
               if (result != null) {
                 refresh();
               }
@@ -132,7 +131,7 @@ class FoundWidget extends StatelessWidget {
         ListProfileTile(
             title: "Account Setting",
             subtitle: "Notifications, password",
-            onTap: () {}),
+            onTap: () {}),]
       ],
     ));
   }

@@ -7,6 +7,10 @@ sealed class SellerRegisterEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class SellerRegisterFetchList extends SellerRegisterEvent {
+  SellerRegisterFetchList();
+}
+
 class SellerRegisterCreate extends SellerRegisterEvent {
   final String shopName;
   final String email;

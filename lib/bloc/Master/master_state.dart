@@ -1,12 +1,9 @@
 part of 'master_bloc.dart';
 
-sealed class MasterState extends Equatable {
+sealed class MasterState {
   const MasterState({required this.tabIndex,  this.userType});
   final int tabIndex; 
   final String? userType;
-  //copywith
-  @override
-  List<Object> get props => [tabIndex, userType!];
   
 }
 final class MasterInitial extends MasterState {

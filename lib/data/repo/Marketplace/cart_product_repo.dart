@@ -71,5 +71,15 @@ class CartProductRepo{
       throw e;
     }
   }
-  
+  //remove product from cart
+  static Future<String> removeProductFromCart(CartProductModel model) async{
+    try{
+      CollectionReference _cartCollection = _userCollection.doc(userID).collection("CartProduct");
+      await _cartCollection.doc(model.id).delete();
+      return "Successfully Removed";
+    }
+    catch(e){
+      throw e;
+    }
+  }
 }

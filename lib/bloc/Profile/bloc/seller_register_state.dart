@@ -45,3 +45,23 @@ final class SellerRegisterBusinessTypeUpdated extends SellerRegisterState {
   @override
   List<Object> get props => [businessType];
 }
+
+final class SellerRegisterListFetchedSuccess extends SellerRegisterState {
+  final SellerAccountModel sellerList;
+
+  const SellerRegisterListFetchedSuccess({required this.sellerList});
+
+  @override
+  List<Object> get props => [sellerList];
+}
+
+final class SellerRegisterListFetchedEmpty extends SellerRegisterState {}
+
+final class SellerRegisterListFetchedFail extends SellerRegisterState {
+  final String message;
+
+  const SellerRegisterListFetchedFail({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}

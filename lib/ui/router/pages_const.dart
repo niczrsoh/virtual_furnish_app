@@ -28,6 +28,9 @@ class PagePath {
   static const String pathMarketplace = '/marketplace';
   static const String pathItemList = '/item_list';
   static const String pathItemDetail = '/item_detail';
-  static const String pathARViewer = '/ar_viewer';
+  static const String pathARSpace = '/ar_space';
   static const String pathDeliveryAddress = '/delivery_address';
+  static const String pathSellerRegisterList = '/seller_register_list';
+  static const String pathSellingOrder = '/selling_order';
+  static const String pathOrderDetail = '/order_detail';
 }

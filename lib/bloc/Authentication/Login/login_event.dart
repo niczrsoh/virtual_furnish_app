@@ -33,3 +33,10 @@ class LoginPageEnableButton extends LoginEvent {
 
   LoginPageEnableButton({required this.isButtonEnabled});
 }
+
+class VerifyCode extends LoginEvent {
+  final String code;
+  final String verificationId;
+
+  VerifyCode({required this.code, required this.verificationId});
+}

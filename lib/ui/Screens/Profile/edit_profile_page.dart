@@ -60,17 +60,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
           body: BlocConsumer<EditProfileBloc, EditProfileState>(
             listener: (context, state) {
-              if (state is UserProfileFound) {
-                WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+              if (state is UserProfileFound && isFirstTime) {
+                  setState(() {
+                    isFirstTime = false;
+                  });
                   usernameController.text = state.userModel.username ?? "";
                   emailController.text = state.userModel.email ?? "";
-                  contactController.text = state.userModel.contact ?? "";
-                  setState(() {
+                  contactController.text = (state.userModel.contact!=null)? ((state.userModel.contact!.contains("+60"))?state.userModel.contact!.replaceAll("+60", ""):state.userModel.contact!):"";
                   profilePic = state.userModel.profilePic;
                   status = state.userModel.status ?? "User";
-                  age = state.userModel.age!;
-                  });
-                });
+                  age = state.userModel.age ?? 0;
               } else if (state is EditProfileSuccess) {
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text(state.message)));
@@ -94,12 +93,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         children: [
                           CircleAvatar(
                             radius: 40,
-                            backgroundImage: (profilePic != null )
+                            backgroundImage: (profilePic != null && profilePic!.isNotEmpty)
                                 ? (profilePic!.contains("https://"))
                                     ? Image.network(profilePic!).image
                                     : Image.file(File(profilePic!)).image
-                                : Image.network(
-                                        "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?size=338&ext=jpg&ga=GA1.1.1700460183.1708646400&semt=ais")
+                                : Image.asset('assets/images/profilepic-anonymous.jpg')
                                     .image,
                           ),
                           TextButton(
@@ -151,7 +149,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ),
                           ListTile(
                             title: const Text('Email'),
-                            subtitle: TextFormField(
+                            subtitle: TextField(
                               controller: emailController,
                               decoration: InputDecoration(
                                 hintText: 'Enter your email',

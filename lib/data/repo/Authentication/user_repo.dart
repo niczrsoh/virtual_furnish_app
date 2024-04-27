@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/firebaseStorageRepo.dart';
@@ -20,9 +21,11 @@ class UserRepo{
   //get user using the user id
   static Future<UserModel> getUser(String id) async {
     try{
+    if(FirebaseAuth.instance.currentUser!.isAnonymous){
+      return UserModel(id: FirebaseAuth.instance.currentUser!.uid, username: "Guest", email: "Guest", age: 0, profilePic: "", contact: "", status: "Guest");
+    }else{
       DocumentSnapshot documentSnapshot = await _userCollection.doc(id).get();
-      return UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);}
-    
+      return UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);}}
     catch(e){
       throw e;
     }

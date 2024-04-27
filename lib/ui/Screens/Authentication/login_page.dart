@@ -88,19 +88,27 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    //forgot password at the right side
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text('Forgot Password?'),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            size: 15,
-                          )
-                        ],
-                      ),
+                    //forgot password at the left side
+                    Row(
+                      children: [
+                          Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+                          child: TextButton(child:Text('Create a new Account'), onPressed: () {
+                            Navigator.pushNamed(context, '/register');
+                          }, style: ButtonStyle(
+                            foregroundColor: MaterialStateProperty.all(CustomColor.vfPrimaryColor)),
+                          )),
+                          Expanded(
+                            child: Container(),
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+                          child: TextButton(child:Text('Forgot Password'), onPressed: () {
+                            // Navigator.pushNamed(context, '/register');
+                          },style: ButtonStyle(
+                            foregroundColor: MaterialStateProperty.all(CustomColor.vfPrimaryColor)),)
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 10),
                     BlocSelector<LoginBloc, LoginState, bool>(

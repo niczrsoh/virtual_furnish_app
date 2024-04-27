@@ -2,8 +2,6 @@ part of 'login_bloc.dart';
 abstract class LoginState {
   const LoginState({this.message});
   final String? message;
-  @override
-  List<Object> get props => [];
 }
 
 final class LoginInitial extends LoginState {}
@@ -22,3 +20,17 @@ class LoginPageButtonEnabled extends LoginState {
   LoginPageButtonEnabled({required this.isButtonEnabled});
 }
 
+class CodeSent extends LoginState {
+  final String verificationId;
+  CodeSent({required this.verificationId});
+}
+
+class CodeFailed extends LoginState {
+  final String message;
+  CodeFailed({required this.message});
+}
+
+class CodeVerified extends LoginState {
+  final String message;
+  CodeVerified({required this.message});
+}

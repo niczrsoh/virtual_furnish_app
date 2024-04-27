@@ -1,15 +1,15 @@
 part of 'cart_bloc.dart';
 
-sealed class CartState extends Equatable{
+sealed class CartState{
    CartState({this.cartProducts, this.products, this.totalPrice, this.selectedCartProducts});
   List<CartProductModel>? cartProducts;
   List<CartProductModel>? selectedCartProducts = [];
   List<MarketplaceProductModel>? products;
   double? totalPrice;
-  @override
-  List<Object?> get props => [cartProducts, products, totalPrice, selectedCartProducts];
+  // @override
+  // List<Object?> get props => [cartProducts, products, totalPrice, selectedCartProducts];
 }
-
+final class CartActionState extends CartState {}
 final class CartInitial extends CartState {}
 
 final class CartListFetchedSuccess extends CartState {
@@ -19,10 +19,6 @@ final class CartListFetchedSuccess extends CartState {
   final List<CartProductModel> selectedCartProducts;
   CartListFetchedSuccess(this.cartProducts, this.products, this.totalPrice, this.selectedCartProducts):super(cartProducts: cartProducts, products: products, totalPrice: totalPrice, selectedCartProducts: selectedCartProducts);
 
-
-  // static CartState copyWith(List<CartProductModel> updatedProducts, List<MarketplaceProductModel> list) {
-  //   return CartListFetchedSuccess(updatedProducts, list);
-  // }
 }
 
 final class CartError extends CartState {
@@ -33,7 +29,13 @@ final class CartError extends CartState {
 }
 
 final class CartProductAdded extends CartState {}
-final class CartProductRemoved extends CartState {}
+final class CartProductRemoved extends CartState {
+  final List<CartProductModel> cartProducts;
+  final List<MarketplaceProductModel> products;
+  final double totalPrice;
+  final List<CartProductModel> selectedCartProducts;
+  CartProductRemoved(this.selectedCartProducts,this.cartProducts, this.products, this.totalPrice):super(selectedCartProducts: selectedCartProducts,cartProducts: cartProducts, products: products, totalPrice: totalPrice);
+}
 final class CartProductUpdated extends CartState {
     final List<CartProductModel> cartProducts;
   final List<MarketplaceProductModel> products;

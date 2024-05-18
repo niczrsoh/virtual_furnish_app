@@ -96,7 +96,6 @@ Future<File> _downloadFile(String url, String filename) async {
     var bytes = await consolidateHttpClientResponseBytes(response);
     String dir = (await getApplicationDocumentsDirectory()).path;
     //new directory
-    // Create the 'waterTower' directory if it doesn't exist
     Directory waterTowerDir = Directory('$dir/vaseClay');
     await waterTowerDir.create(recursive: true);
 

@@ -13,19 +13,22 @@ class SellingOrderPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('Selling Order Page'),
       ),
       body: BlocConsumer<SellingOrderBloc, SellingOrderState>(
             //build when is not action state
             buildWhen: (previous, current) => current is! SellingOrderActionState,
-            //listener when is action state
-            listenWhen: (previous, current) => current is SellingOrderActionState,
             bloc: sellingOrderBloc,
             listener: (context, state) {
             },
             builder: (context, state) {
               switch (state.runtimeType) {
                 case SellingOrderInitial:
+                  sellingOrderBloc.add(FetchItems());
+                  return const Center(child: CircularProgressIndicator());
+                case SellingOrderLoading:
+                  sellingOrderBloc.add(FetchItems());
                   return const Center(child: CircularProgressIndicator());
                 case SellingOrderLoaded:
                   SellingOrderLoaded cuurentState =
@@ -39,15 +42,13 @@ class SellingOrderPage extends StatelessWidget {
                             i < cuurentState.items.length;
                             i++) {
                           data.add(Entry(
-                              cuurentState.items[i].productID.toString(),
+                              cuurentState.product_model[i].name.toString(),
                               <Entry>[
-                               
-                                Entry(
-                                    "Customer Id : RM${cuurentState.items[i].customerID.toString()}"),
+                                Entry("Customer Id : ${cuurentState.items[i].customerID.toString()}"),
                                 Entry(
                                     "Amount : ${cuurentState.items[i].amount.toString()}"),
                                 Entry(
-                                    "Courier Service: ${cuurentState.items[i].courier.toString()}"),
+                                    "Courier: ${cuurentState.items[i].courier.toString()}"),
                                 Entry(
                                     "Transaction No: ${cuurentState.items[i].transactionNumber.toString()}"),
                                 Entry(
@@ -59,10 +60,12 @@ class SellingOrderPage extends StatelessWidget {
                       },
                     ),
                   );
+                case SellingOrderEmpty:
+                  return const Center(child: Text('No order found'));
                 case SellingOrderError:
                   return const Text('Failed to fetch data');
                 default:
-                  return const Center(child: CircularProgressIndicator());
+                  return const Text('Something went wrong');
               }
             },
           ),
@@ -79,20 +82,82 @@ class EntryItem extends StatelessWidget {
   final int index;
   Widget _buildTiles(Entry root) {
     if (root.children.isEmpty) return ListTile(title: Text(root.title));
+    String customerID = root.children[0].title.split(":").last.trim();
     return ExpansionTile(
       key: PageStorageKey<Entry>(root),
       title: Text(root.title),
       children: [
         for (int i = 0; i < root.children.length; i++)
-          _buildChildrenTiles(root.children[i], index)
+          _buildChildrenTiles(root.children[i], index, customerID)
       ]
     );
   }
 
-  Widget _buildChildrenTiles(Entry root, int index) {
-    return GestureDetector(
+  Widget _buildChildrenTiles(Entry root, int index, String customerID) {
+    return (root.title.contains("Courier:") || root.title.contains("Transaction No") || root.title.contains("Status"))?
+     GestureDetector(
                 onTap: () {},
-                child:  ListTile(
+                child: BlocBuilder<SellingOrderBloc, SellingOrderState>(
+                  bloc: sellingOrderBloc,
+                  buildWhen: (previous, current) => current is SellingOrderActionState,
+                  builder: (context, state) {
+                    return ListTile(
+                        trailing: IconButton(
+                            onPressed: () {
+                               String type = root.title.split(':').first;
+                              if(state is OrderRequestEditSuccess && state.isEdit){
+                                 sellingOrderBloc.add(RequestOrderEdit(type: type,isEdit: false, index: index));
+                              }else{
+                              sellingOrderBloc.add(RequestOrderEdit(type: type,isEdit: true, index: index));}
+                            },
+                            icon: Icon(Icons.edit)),
+                        title: (state is OrderRequestEditSuccess && state.isEdit && state.type == root.title.split(':').first && index == state.index)
+                            ? (state.type == "Status")? 
+                            //drop down here
+                            DropdownButton<String>(
+                              value: root.title.split(':').last.trim(),
+                              icon: const Icon(Icons.arrow_downward),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.deepPurple),
+                              underline: Container(
+                                height: 2,
+                                color: Colors.deepPurpleAccent,
+                              ),
+                              onChanged: (String? newValue) {
+                                sellingOrderBloc.add(OrderModification(
+                                    id: id,
+                                    type: state.type,
+                                    index: state.index,
+                                    value: newValue!,  
+                                    customerID: customerID,
+                                    ));
+                              },
+                              items: <String>['process','shipped','cancelled']
+                                  .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            )
+                            :TextField(
+                                key: PageStorageKey('myScrollable'),
+                                controller: TextEditingController(text: root.title.split(':').last.trim()),
+                                onSubmitted: (value) {
+                                  sellingOrderBloc.add(OrderModification(
+                                      id: id,
+                                      type: state.type,
+                                      index: state.index,
+                                      value: value,
+                                      customerID: customerID));
+                                },
+                            ): Text(((state is UpdateOrderItemSuccess && root.title.split(":").first == state.type && index == state.index)?"${state.type}: ${state.value}":root.title)));
+                  },
+                ))
+    :GestureDetector(
+                onTap: () {},
+                child: ListTile(
                         title: Text(root.title)
                   ));
   }

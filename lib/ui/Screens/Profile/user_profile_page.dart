@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/user_profile_bloc.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
+import 'package:virtual_furnish_app/ui/Screens/master_page.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_button.dart';
+import 'package:virtual_furnish_app/ui/router/router.dart';
 
 class UserProfilePage extends StatelessWidget {
   final UserProfileBloc userProfileBloc;
@@ -26,6 +28,7 @@ class UserProfilePage extends StatelessWidget {
             if(state is UserProfileFound){
               final foundState = state as UserProfileFound;
               return FoundWidget(
+                  currentState: foundState,
                   userModel: foundState.userModel,
                   userProfileBloc: userProfileBloc);}
             else if(state is UserProfileError){
@@ -46,10 +49,12 @@ class UserProfilePage extends StatelessWidget {
             onPressed: () {
               AuthRepo.logout();
               //remove current state
-      //        userProfileBloc.close();
+      //]        userProfileBloc.close();
               //reload the page
+              
+              
               Navigator.pushNamedAndRemoveUntil(
-                  context, '/login', (route) => false);
+                  context, '/', (route) => false);
             },
             icon: const Icon(Icons.logout),
           )
@@ -63,9 +68,11 @@ class FoundWidget extends StatelessWidget {
   const FoundWidget({
     super.key,
     required this.userModel,
+    required this.currentState,
     required this.userProfileBloc,
   });
   final UserModel userModel;
+  final UserProfileFound currentState;
   final UserProfileBloc userProfileBloc;
   void refresh() {
     userProfileBloc.add(UserProfileFetched());
@@ -116,7 +123,10 @@ class FoundWidget extends StatelessWidget {
         ),
         if(userModel.status!="Guest")...[
         ListProfileTile(
-            title: "My Orders", subtitle: "already have 0 order", onTap: () {}),
+            title: "My Orders", subtitle: "already have ${currentState.orderNo} order", onTap: () {
+
+              Navigator.pushNamed(context, '/order_detail', arguments: {"type":"process"});
+            }),
         ListProfileTile(
             title: "Shipping Address", subtitle: "3 address", onTap: () {}),
         ListProfileTile(

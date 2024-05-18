@@ -8,7 +8,8 @@ final class LoginInitial extends LoginState {}
 
 class LoginLoading extends LoginState {}
 class LoginSuccess extends LoginState {
-  LoginSuccess({String? message}):super(message: message);
+  String? userType;
+  LoginSuccess({String? message, this.userType}):super(message: message);
 
 }
 class LoginFail extends LoginState {

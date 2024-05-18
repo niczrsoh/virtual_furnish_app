@@ -1,105 +1,105 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_unity_widget/flutter_unity_widget.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_unity_widget/flutter_unity_widget.dart';
 
 
 
-class ARSpacePage extends StatefulWidget {
-  ARSpacePage({Key? key, this.itemId}) : super(key: key);
-  String? itemId;
-  @override
-  State<ARSpacePage> createState() => _ARSpacePageState();
-}
+// class ARSpacePage extends StatefulWidget {
+//   ARSpacePage({Key? key, this.itemId}) : super(key: key);
+//   String? itemId;
+//   @override
+//   State<ARSpacePage> createState() => _ARSpacePageState();
+// }
 
-class _ARSpacePageState extends State<ARSpacePage> {
-  static final GlobalKey<ScaffoldState> _scaffoldKey =
-      GlobalKey<ScaffoldState>();
-  UnityWidgetController? _unityWidgetController;
-  double _sliderValue = 0.0;
+// class _ARSpacePageState extends State<ARSpacePage> {
+//   static final GlobalKey<ScaffoldState> _scaffoldKey =
+//       GlobalKey<ScaffoldState>();
+//   UnityWidgetController? _unityWidgetController;
+//   double _sliderValue = 0.0;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        key: _scaffoldKey,
-        body: Card(
-          margin: const EdgeInsets.all(8),
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Stack(
-            children: <Widget>[
-              UnityWidget(
-                onUnityCreated: onUnityCreated,
-                onUnityMessage: onUnityMessage,
-                onUnitySceneLoaded: onUnitySceneLoaded,
-                fullscreen: false,
-              ),
-              Positioned(
-                bottom: 20,
-                left: 20,
-                right: 20,
-                // <You need a PointerInterceptor here on web>
-                child: Card(
-                  elevation: 10,
-                  child: Column(
-                    children: <Widget>[
-                      const Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text("Rotation speed:"),
-                      ),
-                      Slider(
-                        onChanged: (value) {
-                          setState(() {
-                            _sliderValue = value;
-                          });
-                          setRotationSpeed(value.toString());
-                        },
-                        value: _sliderValue,
-                        min: 0,
-                        max: 20,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: Scaffold(
+//         key: _scaffoldKey,
+//         body: Card(
+//           margin: const EdgeInsets.all(8),
+//           clipBehavior: Clip.antiAlias,
+//           shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(20.0),
+//           ),
+//           child: Stack(
+//             children: <Widget>[
+//               UnityWidget(
+//                 onUnityCreated: onUnityCreated,
+//                 onUnityMessage: onUnityMessage,
+//                 onUnitySceneLoaded: onUnitySceneLoaded,
+//                 fullscreen: false,
+//               ),
+//               Positioned(
+//                 bottom: 20,
+//                 left: 20,
+//                 right: 20,
+//                 // <You need a PointerInterceptor here on web>
+//                 child: Card(
+//                   elevation: 10,
+//                   child: Column(
+//                     children: <Widget>[
+//                       const Padding(
+//                         padding: EdgeInsets.only(top: 20),
+//                         child: Text("Rotation speed:"),
+//                       ),
+//                       Slider(
+//                         onChanged: (value) {
+//                           setState(() {
+//                             _sliderValue = value;
+//                           });
+//                           setRotationSpeed(value.toString());
+//                         },
+//                         value: _sliderValue,
+//                         min: 0,
+//                         max: 20,
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
 
-  // Communcation from Flutter to Unity
-  void setRotationSpeed(String speed) {
-    _unityWidgetController?.postMessage(
-      'Cube',
-      'SetRotationSpeed',
-      speed,
-    );
-  }
+//   // Communcation from Flutter to Unity
+//   void setRotationSpeed(String speed) {
+//     _unityWidgetController?.postMessage(
+//       'Cube',
+//       'SetRotationSpeed',
+//       speed,
+//     );
+//   }
 
-  // Communication from Unity to Flutter
-  void onUnityMessage(message) {
-    print('Received message from unity: ${message.toString()}');
-  }
+//   // Communication from Unity to Flutter
+//   void onUnityMessage(message) {
+//     print('Received message from unity: ${message.toString()}');
+//   }
 
-  // Callback that connects the created controller to the unity controller
-  void onUnityCreated(controller) {
-    _unityWidgetController = controller;
-  }
+//   // Callback that connects the created controller to the unity controller
+//   void onUnityCreated(controller) {
+//     _unityWidgetController = controller;
+//   }
 
-  // Communication from Unity when new scene is loaded to Flutter
-  void onUnitySceneLoaded(SceneLoaded? sceneInfo) {
-    if (sceneInfo != null) {
-      print('Received scene loaded from unity: ${sceneInfo.name}');
-      print(
-          'Received scene loaded from unity buildIndex: ${sceneInfo.buildIndex}');
-    }
-  }
-}
+//   // Communication from Unity when new scene is loaded to Flutter
+//   void onUnitySceneLoaded(SceneLoaded? sceneInfo) {
+//     if (sceneInfo != null) {
+//       print('Received scene loaded from unity: ${sceneInfo.name}');
+//       print(
+//           'Received scene loaded from unity buildIndex: ${sceneInfo.buildIndex}');
+//     }
+//   }
+// }

@@ -12,6 +12,7 @@ part 'master_state.dart';
 
 class MasterBloc extends Bloc<MasterEvent, MasterState> {
   MasterBloc() : super(MasterInitial(tabIndex: 0)) {
+    
     on<FetchUserData>(fetchUserData);
     on<MasterEvent>(masterEvent);
   }

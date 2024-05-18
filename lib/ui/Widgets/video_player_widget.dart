@@ -31,7 +31,6 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return (fetch)? SizedBox(
-      width: MediaQuery.of(context).size.width * 0.889,
       height: MediaQuery.of(context).size.height * 0.4,
       child: Stack(
         alignment: Alignment.center,

@@ -6,7 +6,7 @@ class OrderStatus{
   String? latestTransaction;
   String? productID;
   String? from;
-
+  
   OrderStatus({this.id, this.amount, this.status, this.trackingNumber, this.latestTransaction, this.productID, this.from});
 
   Map<String, dynamic> toJson() {

@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
 part 'login_event.dart';
 part 'login_state.dart';
 
@@ -18,8 +19,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   FutureOr<void> fillLoginForm(FillLoginForm event, Emitter<LoginState> emit) async {
     if (event.email.isNotEmpty && event.password.isNotEmpty) {
       String message = await AuthRepo.loginWithEmailandPassword(event.email, event.password);
+       String userType= await SellerRepo.isSeller(AuthRepo.getCurrentUserId()!);
       if(message == "Login Success"){
-      emit(LoginSuccess(message: message));}
+      emit(LoginSuccess(message: message, userType: userType));}
       else{
         emit(LoginFail(message: message));
       } 
@@ -29,8 +31,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
   Future<FutureOr<void>> selectGoogleAccount(SelectGoogleAccount event, Emitter<LoginState> emit) async {
       String message = await AuthRepo.signInWithGoogle();
+       String userType= await SellerRepo.isSeller(AuthRepo.getCurrentUserId()!);
       if (message == "Login Success") {
-        emit(LoginSuccess(message: message));
+        emit(LoginSuccess(message: message, userType: userType));
       } else {
         emit(LoginFail(message: message));
       }
@@ -61,8 +64,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Future<FutureOr<void>> addGuest(AddGuest event, Emitter<LoginState> emit) async {
       String message = await AuthRepo.addGuest();
+       String userType= await SellerRepo.isSeller(AuthRepo.getCurrentUserId()!);
       if (message == "Login Success") {
-        emit(LoginSuccess(message: message));
+        emit(LoginSuccess(message: message, userType: userType));
       } else {
         emit(LoginFail(message: message));
       }

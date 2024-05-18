@@ -121,8 +121,10 @@ class SoldListPage extends StatelessWidget {
                       },
                     ),
                   );
+                case SoldListFetchedSuccessEmpty:
+                  return const Center(child: Text('No selling items found \n Try adding new selling items', textAlign: TextAlign.center));  
                 case SoldListFetctedFail:
-                  return const Text('Failed to fetch data');
+                  return Center(child: const Text('Failed to fetch data'));
                 default:
                   return const Center(child: CircularProgressIndicator());
               }

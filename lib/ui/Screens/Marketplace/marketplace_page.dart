@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/marketplace_bloc.dart';
 import 'package:virtual_furnish_app/enums/item_category.dart';
+import 'package:virtual_furnish_app/main.dart';
 import 'package:virtual_furnish_app/ui/Styles/color_styles.dart';
 
 class MarketplacePage extends StatelessWidget {
@@ -14,10 +15,10 @@ class MarketplacePage extends StatelessWidget {
   TextEditingController searchController = TextEditingController();
 
   List<Image> advertisements = [
-    Image.network(
-        'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/08b6d354987911.5971a0fd31e99.jpg'),
-    Image.network(
-        'https://mir-s3-cdn-cf.behance.net/projects/404/e16bc9104726331.Y3JvcCwyNzI4LDIxMzMsMCw2.jpg')
+    Image.asset('assets/images/SlideShare/LivingRoom.jpeg', scale: 1),
+     Image.asset('assets/images/SlideShare/Bedroom.jpeg', scale: 1,),
+      Image.asset('assets/images/SlideShare/Kitchen.jpeg', scale: 1),
+       Image.asset('assets/images/SlideShare/Bathroom.jpeg', scale: 1),
   ];
 
   List categoryImages = [
@@ -90,6 +91,7 @@ class MarketplacePage extends StatelessWidget {
                     CarouselSlider(
                         items: advertisements,
                         options: CarouselOptions(
+                          aspectRatio: 16 / 9,
                           height: 130,
                           viewportFraction: 1.0,
                           initialPage: 0,

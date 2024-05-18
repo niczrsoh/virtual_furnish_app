@@ -18,6 +18,7 @@ class CartProductPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text('Cart Product Page'),
         ),
         bottomSheet: Container(

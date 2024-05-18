@@ -11,6 +11,7 @@ import 'package:virtual_furnish_app/bloc/Marketplace/item_detail_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/item_list_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/payment_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Master/master_bloc.dart';
+import 'package:virtual_furnish_app/bloc/OrderManagement/order_detail_bloc.dart';
 import 'package:virtual_furnish_app/bloc/OrderManagement/selling_order_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/edit_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/seller_register_bloc.dart';
@@ -18,6 +19,7 @@ import 'package:virtual_furnish_app/bloc/Profile/bloc/user_profile_bloc.dart';
 import 'package:virtual_furnish_app/core/helpers/auth_provider.dart';
 import 'package:virtual_furnish_app/data/model/item_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR%20Space/augmented_reality_space_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_phone.dart';
@@ -33,6 +35,7 @@ import 'package:virtual_furnish_app/ui/Screens/Marketplace/item_detail_page.dart
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/items_list_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/payment_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/OrderManagement/order_detail_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/OrderManagement/selling_order_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/edit_profile_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/seller_register_list.dart';
@@ -54,6 +57,7 @@ class AppRouter {
   static final PaymentBloc paymentBloc = PaymentBloc();
   static final ItemDetailBloc itemDetailBloc = ItemDetailBloc();
   static final CartBloc cartBloc = CartBloc();
+  static final OrderDetailBloc orderDetailBloc = OrderDetailBloc();
   static final AuthenticationProvider authProvider = AuthenticationProvider();
   static final LoginBloc loginBloc = LoginBloc();
   static final SellingOrderBloc sellingOrderBloc = SellingOrderBloc();
@@ -109,12 +113,12 @@ class AppRouter {
                   child: EditProfilePage(bloc: editProfileBloc),
                 ));
       case PagePath.pathMaster:
+        // return MaterialPageRoute(
+        //   settings: settings,
+        //   builder: (context) => MasterPage());
         return MaterialPageRoute(
             settings: settings,
-            builder: (context) => BlocProvider<MasterBloc>.value(
-                  value: masterbloc..add(FetchUserData()),
-                  child: MasterPage(bloc: masterbloc),
-                ));
+            builder: (context) => MasterPage());
       case PagePath.pathSellerRegisterList:
         return MaterialPageRoute(
             settings: settings,
@@ -187,13 +191,13 @@ class AppRouter {
             objectPath: args?['path'],
           ),
         );
-      case PagePath.pathARSpace:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => ARSpacePage(
-            itemId: args?["itemId"],
-          ),
-        );
+      // case PagePath.pathARSpace:
+      //   return MaterialPageRoute(
+      //     settings: settings,
+      //     builder: (_) => ARSpacePage(
+      //       itemId: args?["itemId"],
+      //     ),
+      //   );
       case PagePath.pathCart:
         return MaterialPageRoute(
           settings: settings,
@@ -230,6 +234,14 @@ class AppRouter {
           builder: (_) => BlocProvider<SellingOrderBloc>.value(
             value: sellingOrderBloc..add(FetchItems()),
             child: SellingOrderPage(sellingOrderBloc: sellingOrderBloc,),
+          ),
+        );
+      case PagePath.pathOrderDetail:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider<OrderDetailBloc>.value(
+            value: orderDetailBloc..add(FetchOrderByType(args?['type'])),
+            child: OrderDetailPage(orderBloc: orderDetailBloc,),
           ),
         );
       default:

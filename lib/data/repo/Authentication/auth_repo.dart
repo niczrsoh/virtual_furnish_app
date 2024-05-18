@@ -46,8 +46,7 @@ class AuthRepo {
       var result = await FirebaseAuth.instanceFor(app: app)
           .createUserWithEmailAndPassword(
               email: email, password: password!);
-      if (result != null) {}
-      return "Register Success";
+      return "uid:${result.user!.uid}";
     } catch (e) {
       return e.toString();
     }

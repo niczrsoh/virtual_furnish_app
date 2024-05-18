@@ -12,9 +12,10 @@ final class UserProfileActionState extends UserProfileState {}
 final class UserProfileFound extends UserProfileState {
   final UserModel userModel;
   final bool isGuest;
-  const UserProfileFound( {required this.userModel,required this.isGuest});
+  final int orderNo;
+  const UserProfileFound( {required this.userModel,required this.isGuest, required this.orderNo});
   @override
-  List<Object> get props => [userModel,isGuest];
+  List<Object> get props => [userModel,isGuest, orderNo];
 
 }
 final class UserProfileError extends UserProfileState {

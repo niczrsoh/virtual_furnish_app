@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/user_repo.dart';
+import 'package:virtual_furnish_app/data/repo/OrderManagement/order_repo.dart';
 
 part 'user_profile_event.dart';
 part 'user_profile_state.dart';
@@ -28,11 +29,12 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
 
   Future<FutureOr<void>> userProfileFetched(UserProfileFetched event, Emitter<UserProfileState> emit) async {
     String? id = AuthRepo.getCurrentUserId();
+    int? orderNo = await OrderRepo.getOrderNumbers();
     UserModel? userModel;
     if(id!=null){
     userModel = await UserRepo.getUser(id);
     if(userModel!=null){
-      emit(UserProfileFound(userModel: userModel , isGuest: userModel.status=="Guest"));
+      emit(UserProfileFound(userModel: userModel , isGuest: userModel.status=="Guest", orderNo: orderNo));
     }
     else{
       emit(UserProfileError(errorMessage: "User not found"));

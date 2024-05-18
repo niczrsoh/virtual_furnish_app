@@ -19,16 +19,19 @@ class SoldListBloc extends Bloc<SoldListEvent, SoldListState> {
     on<ProductModification>(productModification);
     on<RequestEdit>(requestEdit);
   }
-     String? id = AuthRepo.getCurrentUserId();
+  String? id = AuthRepo.getCurrentUserId();
   FutureOr<void> soldListDataFetched(
       SoldListDataFetched event, Emitter<SoldListState> emit) async{
     emit(SoldListFetctedLoading());
- 
+    String? initId = AuthRepo.getCurrentUserId();
+    initId == null ? id = "": id = initId;
     List<MarketplaceProductModel> soldListData = await MarketplaceRepo.getSellingItems(id!);
     print('data: ${soldListData.toString()}');
     if (soldListData.isNotEmpty) {
         emit(SoldListDataFetchedByNameSuccess(soldListData: soldListData));
-    } else {
+    } else if (soldListData.isEmpty) {
+      emit(SoldListFetchedSuccessEmpty());}
+    else{
       emit( SoldListFetctedFail());
     }
   }

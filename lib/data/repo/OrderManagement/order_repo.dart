@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:virtual_furnish_app/bloc/OrderManagement/order_detail_bloc.dart';
 import 'package:virtual_furnish_app/data/model/OrderManagement/market_order_model.dart';
 import 'package:virtual_furnish_app/data/model/OrderManagement/order_status_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
@@ -9,8 +10,8 @@ class OrderRepo{
   static final CollectionReference _sellerCollection = FirebaseFirestore.instance.collection("SellAccount");
   static final CollectionReference _userCollection = FirebaseFirestore.instance.collection("User");
   static const String sellerCollectionName = 'MarketOrder';
-  static const String userCollectionName = 'MarketOrder';
-
+  static const String userCollectionName = 'OrderStatus';
+  
   //get collection of orders
   static DocumentReference getSellerDocumentReference() {
     String? sellerID = AuthRepo.getCurrentUserId();
@@ -38,8 +39,9 @@ class OrderRepo{
 
   static Future<String> createOrder(MarketOrder order, String id) async {
   try{
-    await _sellerCollection.doc(id).collection(sellerCollectionName).add(order.toJson());
-    return "Order Created";
+     CollectionReference collectionReference = await _sellerCollection.doc(id).collection(sellerCollectionName);
+     DocumentReference documentReference = await collectionReference.add(order.toJson());
+    return "Order Created:${documentReference.id}";
     }
     catch(e){
       return e.toString();
@@ -65,13 +67,62 @@ class OrderRepo{
       items.add(model);}
     return items;
   }
-  Future<MarketOrder> updateOrder(MarketOrder order) async {
-    // update order from api
-     return MarketOrder();
+  static Future<String> updateOrder(String id, String type, String value, String customerID) async {
+    try{
+      type = type.trim();
+      //first letter of type is lowercase
+      String firstLetter = type[0].toLowerCase();
+      type = firstLetter + type.substring(1);
+      Map updatedData = {
+        type: value,
+      };
+      if(type == 'status'){
+        //update the user side also
+        CollectionReference reference=_userCollection.doc(customerID).collection(userCollectionName); 
+        //find the market order id
+        QuerySnapshot querySnapshot = await reference.where('from', isEqualTo: id).get();
+        for(DocumentSnapshot doc in querySnapshot.docs){
+          if(value == 'shipped')
+          reference.doc(doc.id).update({"status": value,"latestTransaction": "Your order has been shipped"});
+          else if(value == 'process')
+          reference.doc(doc.id).update({"status": value,"latestTransaction": "Seller is processing your order"});
+        }
+      }else if(type == 'transactionNumber'){
+                //update the user side also
+                CollectionReference reference=_userCollection.doc(customerID).collection(userCollectionName); 
+                //find the market order id
+                QuerySnapshot querySnapshot = await reference.where('from', isEqualTo: id).get();
+                for(DocumentSnapshot doc in querySnapshot.docs){
+                  reference.doc(doc.id).update({"trackingNumber": value});
+                }
+      }
+      getSellerDocumentReference().collection(sellerCollectionName).doc(id).update(Map<String, dynamic>.from(updatedData));
+      
+      return value;
+    }
+    catch(e){
+      return e.toString();
+    }
   }
-
   Future<MarketOrder> deleteOrder(int id) async {
     // delete order from api
      return MarketOrder();
+  }
+
+  static Future<List<OrderStatus>> fetchOrderByType(String type) async {
+    // fetch order by type from api
+    QuerySnapshot querySnapshot = await getUserDocumentReference().collection(userCollectionName).where('status', isEqualTo: type).get();
+    List<OrderStatus> items=[];
+    for(DocumentSnapshot doc in querySnapshot.docs){
+      OrderStatus model = OrderStatus.fromJson(doc.data() as Map<String, dynamic>);
+      model.id = doc.id;
+      items.add(model);}
+    return items;
+  }
+
+  //get order numbers
+  static Future<int> getOrderNumbers() async {
+    QuerySnapshot querySnapshot = await getUserDocumentReference().collection(userCollectionName).get();
+    return querySnapshot.docs.length;
   }
 }

@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Authentication/Login/login_bloc.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
 import 'package:virtual_furnish_app/enums/globalization_enum.dart';
 import 'package:virtual_furnish_app/main.dart';
 import 'package:virtual_furnish_app/ui/Styles/color_styles.dart';

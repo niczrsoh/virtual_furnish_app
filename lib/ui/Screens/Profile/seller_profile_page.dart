@@ -2,12 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_iterum/flutter_iterum.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/seller_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/user_profile_bloc.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/sell_account_model.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_button.dart';
+import 'package:virtual_furnish_app/ui/router/router.dart';
 
 class SellerProfilePage extends StatelessWidget {
   final SellerProfileBloc sellerProfileBloc;
@@ -45,8 +48,9 @@ class SellerProfilePage extends StatelessWidget {
           IconButton(
             onPressed: () {
               AuthRepo.logout();
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/login', (route) => false);
+              Iterum.revive(context);
+              Navigator.popUntil(context, ModalRoute.withName('/'));
+            //  Restart.restartApp();
             },
             icon: const Icon(Icons.logout),
           )

@@ -71,19 +71,19 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
         customerID: userID,
         transactionNumber: "",
       );
+      String resultProductBuyer = await MarketplaceRepo.buyProduct(event.items[i].productID!, event.items[i].amount!);
+      MarketplaceProductModel model = await MarketplaceRepo.getSellingItem(event.items[i].productID!);
+      String resultSellOrder = await OrderRepo.createOrder(marketOrder, model.sellerID!);
       OrderStatus orderStatus = OrderStatus(
         amount: event.items[i].amount,
         productID: event.items[i].productID,
-        from: "",
+        from: resultSellOrder.split(":").last.trim(),
         status: 'process',
         latestTransaction: "Seller is processing your order",
         trackingNumber: "",
       );
-      String resultProductBuyer = await MarketplaceRepo.buyProduct(event.items[i].productID!, event.items[i].amount!);
-      MarketplaceProductModel model = await MarketplaceRepo.getSellingItem(event.items[i].productID!);
-      String resultSellOrder = await OrderRepo.createOrder(marketOrder, model.sellerID!);
       String resultOrderStatus = await OrderRepo.createOrderStatus(orderStatus, userID!);
-      if(resultOrderStatus != "Order Status Created" || resultSellOrder != "Order Created" || resultCart != "Successfully Removed" || resultProductBuyer != "Product Bought"){
+      if(resultOrderStatus != "Order Status Created" || !resultSellOrder.contains("Order Created") || resultCart != "Successfully Removed" || resultProductBuyer != "Product Bought"){
        flag = false;
        break;
       }

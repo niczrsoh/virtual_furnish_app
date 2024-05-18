@@ -5,14 +5,20 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/marketplace_bloc.dart';
+import 'package:virtual_furnish_app/bloc/OrderManagement/selling_order_bloc.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR Space/augmented_reality_space_page.dart';
 import 'package:virtual_furnish_app/bloc/Master/master_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/seller_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/user_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/create_selling_item_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/sold_list_bloc.dart';
+import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_core_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_flutter_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/cart_product_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/OrderManagement/selling_order_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/seller_profile_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/user_profile_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Sold/create_selling_item_page.dart';
@@ -36,12 +42,14 @@ List<BottomNavigationBarItem> sellerBottomNavBars =
   BottomNavigationBarItem(icon: Icon(Icons.person), label: 'profile'),
 ];
 int tabIndex = 0;
- UserProfileBloc userProfileBloc = UserProfileBloc()..add(UserProfileFetched());
- SellerProfileBloc sellerProfileBloc = SellerProfileBloc();
- CartBloc cartBloc = CartBloc()..add(LoadCart());
- CreateSellingItemBloc createSellingItemBloc = CreateSellingItemBloc();
- SoldListBloc soldListBloc = SoldListBloc()..add(SoldListDataFetched());
- MarketplaceBloc marketplaceBloc = MarketplaceBloc()..add(FetchMostSellingItems());
+UserProfileBloc userProfileBloc = UserProfileBloc()..add(UserProfileFetched());
+SellerProfileBloc sellerProfileBloc = SellerProfileBloc();
+CartBloc cartBloc = CartBloc()..add(LoadCart());
+CreateSellingItemBloc createSellingItemBloc = CreateSellingItemBloc();
+SellingOrderBloc sellingOrderBloc = SellingOrderBloc()..add(FetchItems());
+SoldListBloc soldListBloc = SoldListBloc()..add(SoldListDataFetched());
+MarketplaceBloc marketplaceBloc = MarketplaceBloc()
+  ..add(FetchMostSellingItems());
 List<Widget> bottomNavScreen = [
   BlocProvider<MarketplaceBloc>.value(
     value: marketplaceBloc,
@@ -51,7 +59,9 @@ List<Widget> bottomNavScreen = [
     value: cartBloc,
     child: CartProductPage(cartBloc: cartBloc),
   ),
-  ARSpacePage(),
+  //RemoteObject(),
+ ARFlutterPage(),
+  //ARSpacePage(),
   Text('index 3: message'),
   BlocProvider<UserProfileBloc>.value(
     value: userProfileBloc,
@@ -65,7 +75,10 @@ List<Widget> sellerBottomNavScreen = [
       soldListBloc: soldListBloc,
     ),
   ),
-  RunningDotsLoader(),
+  BlocProvider<SellingOrderBloc>.value(
+    value: sellingOrderBloc,
+    child: SellingOrderPage(sellingOrderBloc: sellingOrderBloc),
+  ),
   // Text('index 1: cart'),
   BlocProvider<CreateSellingItemBloc>.value(
     value: createSellingItemBloc,
@@ -79,53 +92,49 @@ List<Widget> sellerBottomNavScreen = [
 ];
 
 class MasterPage extends StatefulWidget {
-  const MasterPage({super.key, required this.bloc});
-  final MasterBloc bloc;
+  const MasterPage({super.key});
 
   @override
   State<MasterPage> createState() => _MasterPageState();
 }
 
 class _MasterPageState extends State<MasterPage> {
+  late String userType;
+  bool foundUserType = false;
+  @override
+  void initState() {
+    getSeller();
+    super.initState();
+  }
+  void getSeller() async {
+     userType= await SellerRepo.isSeller(AuthRepo.getCurrentUserId()!);
+     if(userType != null && userType.isNotEmpty){
+       setState(() {
+          userType = userType;
+          foundUserType = true;
+       });
+     }
+  }
   @override
   Widget build(BuildContext context) {
-    
-    return BlocConsumer<MasterBloc, MasterState>(
-      listener: (context, state) {},
-      builder: (context, state) {
-        if (state is MasterUserDataFetched || state is MasterTabChanged) {
-          if(state.userType != "seller" && state.tabIndex == 0){
-            marketplaceBloc.add(FetchMostSellingItems());
-          }
-          return Scaffold(
-            body: Center(
-                child: state.userType == "seller"
-                    ? sellerBottomNavScreen.elementAt(state.tabIndex)
-                    : bottomNavScreen.elementAt(state.tabIndex)),
-            bottomNavigationBar: BottomNavigationBar(
-              items: state.userType == "seller"
-                  ? sellerBottomNavBars
-                  : bottomNavBars,
-              selectedItemColor: Colors.teal,
-              unselectedItemColor: Colors.grey,
-              currentIndex: state.tabIndex,
-              onTap: (index) {
-                if(state.userType != "seller" && index == 1){
-                    cartBloc.add(LoadCart());
-                }else if(state.userType != "seller" && index == 4){
-                    userProfileBloc.add(UserProfileFetched());}
-                   widget.bloc.add(TabChange(tabIndex: index));
-              },
-            ),
-          );
-        } else {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-      },
-    );
-  }
+         return  (foundUserType)?  Scaffold(
+              body: Center(
+                  child: userType == "seller"
+                      ? sellerBottomNavScreen.elementAt(tabIndex)
+                      : bottomNavScreen.elementAt(tabIndex)),
+              bottomNavigationBar: BottomNavigationBar(
+                items: userType == "seller"
+                    ? sellerBottomNavBars
+                    : bottomNavBars,
+                selectedItemColor: Colors.teal,
+                unselectedItemColor: Colors.grey,
+                currentIndex: tabIndex,
+                onTap: (index) {
+                  setState(() {
+                    tabIndex = index;
+                  });
+                },
+              ),
+            ): Center(child: RunningDotsLoader());
 }
+  }

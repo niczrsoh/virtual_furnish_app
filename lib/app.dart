@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:virtual_furnish_app/main.dart';
+import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_flutter_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Common/three_dimension_object_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/empty_page.dart';
 import 'package:virtual_furnish_app/ui/Styles/color_styles.dart';
 import 'package:virtual_furnish_app/ui/router/router.dart';
@@ -20,6 +22,7 @@ class App extends StatelessWidget {
     ]);
     mq = MediaQuery.of(context).size;
     return MaterialApp(
+    //  home: ARFlutterPage(),
       navigatorObservers: [routeObserver],
       title: 'Virtual Furnish',
       theme: ThemeData(
@@ -79,6 +82,7 @@ class App extends StatelessWidget {
          Locale('en', 'IN'), // English
          Locale('zh', 'IN')
       ],
+      
       onGenerateRoute: AppRouter.onGenerateRoute,
       onUnknownRoute: (setting) => MaterialPageRoute(
         builder: (_) => const EmptyPage(),

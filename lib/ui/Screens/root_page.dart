@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Master/master_bloc.dart';
 import 'package:virtual_furnish_app/core/helpers/auth_provider.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
 import 'package:virtual_furnish_app/data/source/view_items_source.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/master_page.dart';
@@ -28,18 +30,14 @@ class _RootPageState extends State<RootPage> {
     return Scaffold(
       body: StreamBuilder(
         stream: isRegister?null:FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
+        builder: (context, snapshot)  {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
           if (snapshot.hasData) {
-            MasterBloc bloc = MasterBloc();
-            return BlocProvider<MasterBloc>.value(
-                  value: bloc..add(FetchUserData()),
-                  child: MasterPage(bloc: bloc),
-                );
+            return  MasterPage();
           }else{
             return LoginPage();
           }
@@ -47,4 +45,5 @@ class _RootPageState extends State<RootPage> {
       )
     );
   }
+
 }

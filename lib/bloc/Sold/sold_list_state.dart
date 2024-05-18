@@ -14,6 +14,9 @@ final class SoldListFetchedSuccess extends SoldListState {
   final List<MarketplaceProductModel> soldListData;
   SoldListFetchedSuccess({required this.soldListData});
 }
+final class SoldListFetchedSuccessEmpty extends SoldListState {
+  SoldListFetchedSuccessEmpty();
+}
 
 final class SoldListDataFetchedByNameSuccess extends SoldListState {
   final List<MarketplaceProductModel> soldListData;

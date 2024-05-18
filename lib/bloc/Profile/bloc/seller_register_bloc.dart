@@ -24,9 +24,9 @@ class SellerRegisterBloc extends Bloc<SellerRegisterEvent, SellerRegisterState> 
     final userID = await AuthRepo.getCurrentUserId();
     
      final message = await AuthRepo.registerSellerWithEmailandPassword(event.email, event.password);
-      if (message == "Register Success") {
+      if (message.contains("uid:")) {
         SellerAccountModel sellerAccountModel = SellerAccountModel(
-          id: FirebaseAuth.instance.currentUser!.uid,
+          id: message.split(":")[1],
           email: event.email,
           shopName: event.shopName,
           location: event.location,

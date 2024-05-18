@@ -66,6 +66,12 @@ flutter {
 
 
 dependencies {
-    implementation project(':unityLibrary')
-    implementation project(':unityLibrary:xrmanifest.androidlib')
+    // implementation project(':unityLibrary')
+    // implementation project(':unityLibrary:xrmanifest.androidlib')
+       // Provides ArFragment, and other UX resources.
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.8.0'
+
+    // Alternatively, use ArSceneView without the UX dependency.
+    implementation 'com.google.ar.sceneform:core:1.8.0'
+    implementation 'com.google.firebase:firebase-appcheck-safetynet:16.0.0'
 }

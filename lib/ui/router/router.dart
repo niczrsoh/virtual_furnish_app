@@ -20,6 +20,7 @@ import 'package:virtual_furnish_app/core/helpers/auth_provider.dart';
 import 'package:virtual_furnish_app/data/model/item_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
+import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_space_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR%20Space/augmented_reality_space_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_phone.dart';
@@ -191,13 +192,13 @@ class AppRouter {
             objectPath: args?['path'],
           ),
         );
-      // case PagePath.pathARSpace:
-      //   return MaterialPageRoute(
-      //     settings: settings,
-      //     builder: (_) => ARSpacePage(
-      //       itemId: args?["itemId"],
-      //     ),
-      //   );
+      case PagePath.pathARSpace:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ARSpacePage(
+            itemId: args?["itemId"],
+          ),
+        );
       case PagePath.pathCart:
         return MaterialPageRoute(
           settings: settings,

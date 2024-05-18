@@ -14,7 +14,6 @@ import 'package:virtual_furnish_app/bloc/Profile/bloc/seller_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Profile/bloc/user_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/create_selling_item_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/sold_list_bloc.dart';
-import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_core_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_flutter_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/cart_product_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';

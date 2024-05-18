@@ -14,7 +14,14 @@ class MarketplaceRepo{
 
    static final CollectionReference _productCollection = FirebaseFirestore.instance.collection("MarketplaceProduct");
 
-
+    static Future<String> get3DObject(String itemID) async {
+    try{
+      DocumentSnapshot documentSnapshot = await _productCollection.doc(itemID).get();
+      return documentSnapshot["threeDimensionModel"];
+    }
+    catch(e){
+      return e.toString();
+    }}
    //increase current buyer to 1 and deduct the amount
   static Future<String> buyProduct(String id, int amount) async {
     try{

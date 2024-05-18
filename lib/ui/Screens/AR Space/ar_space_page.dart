@@ -15,29 +15,31 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cube/flutter_cube.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:virtual_furnish_app/data/model/MarketplaceProduct/product_model.dart';
+import 'package:virtual_furnish_app/data/repo/Marketplace/marketplace_repo.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_loading_bar.dart';
 
-class ARFlutterPage extends StatefulWidget {
-  ARFlutterPage({super.key});
-
+class ARSpacePage extends StatefulWidget {
+  ARSpacePage({super.key, required this.itemId});
+  final String itemId;
   @override
-  State<ARFlutterPage> createState() => _ARFlutterPageState();
+  State<ARSpacePage> createState() => _ARSpacePageState();
 }
 
-class _ARFlutterPageState extends State<ARFlutterPage> {
+class _ARSpacePageState extends State<ARSpacePage> {
    ARSessionManager? arSessionManager;  
   ARObjectManager? arObjectManager;  
   ARAnchorManager? arAnchorManager;
+   String? filename;
   bool isModelDownloaded = false; 
     HttpClient? httpClient;
     File file = File('');
-    String fileName = "vase clay.glb";
     List<ARNode> nodes = [];  
     List<ARAnchor> anchors = [];
     void initState() {
+      //fetch the 3d model url from item id 
         _downloadFile(
-        "https://firebasestorage.googleapis.com/v0/b/virtualfurnish-93c69.appspot.com/o/TestItems%2FVase_Clay.glb?alt=media&token=dc91c0f9-d1f1-45b3-90ac-4d9d9e0ff718",
-        fileName);
+        widget.itemId);
     super.initState();
     }
     @override  
@@ -82,12 +84,17 @@ class _ARFlutterPageState extends State<ARFlutterPage> {
     this.arSessionManager!.onPlaneOrPointTap = onPlaneOrPointTapped;
     //this.arObjectManager!.onNodeTap = onNodeTapped;
   }
-Future<File> _downloadFile(String url, String filename) async {
+Future<File> _downloadFile(String itemID) async {
   try {
     // HttpClient.enableTimelineLogging = true;
     // SecurityContext securityContext = SecurityContext()
     //   ..setTrustedCertificatesBytes([]);
     // HttpClient httpClient = HttpClient(context: securityContext);
+    MarketplaceProductModel model = await MarketplaceRepo.getSellingItem(itemID);
+    String url = model.threeDimensionModel!;
+    setState(() {
+      filename = model.name!;
+    });
         HttpClient httpClient = HttpClient();
     var request = await httpClient.getUrl(Uri.parse(url));
     var response = await request.close();
@@ -95,11 +102,11 @@ Future<File> _downloadFile(String url, String filename) async {
     var bytes = await consolidateHttpClientResponseBytes(response);
     String dir = (await getApplicationDocumentsDirectory()).path;
     //new directory
-    Directory waterTowerDir = Directory('$dir/vaseClay');
-    await waterTowerDir.create(recursive: true);
+    Directory newDir = Directory('$dir/$itemID');
+    await newDir.create(recursive: true);
 
-    // Create the file in the 'waterTower' directory
-    file = File('${waterTowerDir.path}/$filename');
+    // Create the file in the new directory
+    file = File('${newDir.path}/$filename');
     print("writing to file: " + '${file.path}');
     await file.writeAsBytes(bytes);
     print("Downloading finished, path: " + '$dir/$filename');
@@ -115,6 +122,7 @@ Future<File> _downloadFile(String url, String filename) async {
 }
  Future<void> onPlaneOrPointTapped(
       List<ARHitTestResult> hitTestResults) async {
+       
     var singleHitTestResult = hitTestResults.firstWhere(
         (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane);
     var newAnchor =
@@ -126,7 +134,7 @@ Future<File> _downloadFile(String url, String filename) async {
       var newNode = ARNode(
           type: NodeType.fileSystemAppFolderGLB,
          // type: NodeType.localGLTF2,
-          uri:  "vaseClay/$fileName", // duck.glb
+          uri:  "${widget.itemId}/$filename", // duck.glb
           scale: Vector3(0.5, 0.5, 0.5),
           position: Vector3(0.0, 0.0, 0.0),
           rotation: Vector4(1.0, 0.0, 0.0, 0.0),

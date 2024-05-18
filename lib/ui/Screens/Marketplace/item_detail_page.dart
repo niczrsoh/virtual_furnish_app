@@ -236,7 +236,7 @@ class ItemDetailsPage extends StatelessWidget {
                                 buttonText: 'View in AR',
                                 isDisabled: isButtonDisabled,
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/ar_space');
+                                  Navigator.pushNamed(context, '/ar_space', arguments: {"itemId": currentState.itemData.id});
                                 },
                               )),
                               Flexible(

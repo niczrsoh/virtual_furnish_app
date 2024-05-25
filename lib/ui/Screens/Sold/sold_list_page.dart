@@ -41,6 +41,7 @@ class SoldListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
+        data.clear();
         soldListBloc.add(SoldListDataFetched());
       },
       child: GestureDetector(
@@ -54,9 +55,9 @@ class SoldListPage extends StatelessWidget {
           ),
           body: BlocConsumer<SoldListBloc, SoldListState>(
             //build when is not action state
-            buildWhen: (previous, current) => current is! SoldListActionState && current is! SoldListConditionState,
+         //   buildWhen: (previous, current) => current is! SoldListActionState && current is! SoldListConditionState,
             //listener when is action state
-            listenWhen: (previous, current) => current is SoldListActionState,
+         //   listenWhen: (previous, current) => current is SoldListActionState,
             bloc: soldListBloc,
             listener: (context, state) {
               if (state is DeleteItemSuccess) {
@@ -69,9 +70,13 @@ class SoldListPage extends StatelessWidget {
             },
             builder: (context, state) {
               switch (state.runtimeType) {
+                case SoldListInitial:
+                  soldListBloc.add(SoldListDataFetched());
+                  return const Center(child: CircularProgressIndicator());
                 case SoldListFetctedLoading:
                   return const Center(child: CircularProgressIndicator());
                 case SoldListDataFetchedByNameSuccess:
+                  data.clear();
                   SoldListDataFetchedByNameSuccess cuurentState =
                       state as SoldListDataFetchedByNameSuccess;
                   return Center(
@@ -223,7 +228,7 @@ class EntryItem extends StatelessWidget {
                 onTap: () {},
                 child: BlocBuilder<SoldListBloc, SoldListState>(
                   bloc: soldListBloc,
-                  buildWhen: (previous, current) => current is RequestEditSuccess || current is UpdateItemSuccess,
+                  buildWhen: (previous, current) => current is RequestEditSuccess || current is UpdateItemSuccess || current is SoldListDataFetchedByNameSuccess,
                   builder: (context, state) {
                     return ListTile(
                         trailing: IconButton(

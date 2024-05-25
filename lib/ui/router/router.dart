@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:virtual_furnish_app/bloc/ARSpace/ar_controller_bloc.dart';
+import 'package:virtual_furnish_app/bloc/ARSpace/ar_media_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Authentication/Login/login_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Home/home_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
@@ -20,7 +22,9 @@ import 'package:virtual_furnish_app/core/helpers/auth_provider.dart';
 import 'package:virtual_furnish_app/data/model/item_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
+import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_screenshot_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_space_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_video_image_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR%20Space/augmented_reality_space_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_phone.dart';
@@ -51,7 +55,7 @@ class AppRouter {
   static final HomeBloc homeBloc = HomeBloc()..add(HomeDataFetched(title: ""));
   static final EditProfileBloc editProfileBloc = EditProfileBloc();
   static final MasterBloc masterbloc = MasterBloc();
-
+  static final ArMediaBloc arMediaBloc = ArMediaBloc();
   static final UserProfileBloc userProfileBloc = UserProfileBloc();
   static final ItemListBloc itemListBloc = ItemListBloc();
   static final CheckoutBloc checkoutBloc = CheckoutBloc();
@@ -61,6 +65,7 @@ class AppRouter {
   static final OrderDetailBloc orderDetailBloc = OrderDetailBloc();
   static final AuthenticationProvider authProvider = AuthenticationProvider();
   static final LoginBloc loginBloc = LoginBloc();
+  static final ArControllerBloc arControllerBloc = ArControllerBloc();
   static final SellingOrderBloc sellingOrderBloc = SellingOrderBloc();
   final CounterCubit _counterCubit = CounterCubit();
   static final SellerRegisterBloc sellerRegister = SellerRegisterBloc();
@@ -118,8 +123,7 @@ class AppRouter {
         //   settings: settings,
         //   builder: (context) => MasterPage());
         return MaterialPageRoute(
-            settings: settings,
-            builder: (context) => MasterPage());
+            settings: settings, builder: (context) => MasterPage());
       case PagePath.pathSellerRegisterList:
         return MaterialPageRoute(
             settings: settings,
@@ -195,8 +199,9 @@ class AppRouter {
       case PagePath.pathARSpace:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => ARSpacePage(
-            itemId: args?["itemId"],
+          builder: (_) => BlocProvider.value(
+            value: arControllerBloc..add(ArControllerLoad(itemId: args?["itemId"])),
+            child: ARSpacePage(arControllerBloc: arControllerBloc),
           ),
         );
       case PagePath.pathCart:
@@ -212,7 +217,10 @@ class AppRouter {
           settings: settings,
           builder: (_) => BlocProvider<PaymentBloc>.value(
             value: paymentBloc,
-            child: PaymentPage(paymentBloc: paymentBloc, cartProducts: args?['cartProducts'], totalPayment: args?['total']),
+            child: PaymentPage(
+                paymentBloc: paymentBloc,
+                cartProducts: args?['cartProducts'],
+                totalPayment: args?['total']),
           ),
         );
       case PagePath.pathDeliveryAddress:
@@ -234,7 +242,9 @@ class AppRouter {
           settings: settings,
           builder: (_) => BlocProvider<SellingOrderBloc>.value(
             value: sellingOrderBloc..add(FetchItems()),
-            child: SellingOrderPage(sellingOrderBloc: sellingOrderBloc,),
+            child: SellingOrderPage(
+              sellingOrderBloc: sellingOrderBloc,
+            ),
           ),
         );
       case PagePath.pathOrderDetail:
@@ -242,7 +252,25 @@ class AppRouter {
           settings: settings,
           builder: (_) => BlocProvider<OrderDetailBloc>.value(
             value: orderDetailBloc..add(FetchOrderByType(args?['type'])),
-            child: OrderDetailPage(orderBloc: orderDetailBloc,),
+            child: OrderDetailPage(
+              orderBloc: orderDetailBloc,
+            ),
+          ),
+        );
+      case PagePath.pathARScreenShot:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider<ArMediaBloc>.value(
+            value: arMediaBloc..add(ArMediaLoad()),
+            child: ARScreenshotPage(bloc: arMediaBloc, image: args?['image']),
+          ),
+        );
+      case PagePath.pathARVideoImages:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider<ArMediaBloc>.value(
+            value: arMediaBloc..add(ArMediaLoad()),
+            child: ARVideoImagesPage(bloc: arMediaBloc),
           ),
         );
       default:

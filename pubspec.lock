@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: android_intent_plus
-      sha256: e92d14009f3f6ebafca6a601958aaebb793559fb03a1961fe3c5596db95af2cb
+      sha256: e1c62bb41c90e15083b7fb84dc327fe90396cc9c1445b55ff1082144fabfb4d9
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.1"
+    version: "4.0.3"
   ar_flutter_plugin_flutterflow:
     dependency: "direct main"
     description:
@@ -342,6 +342,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_3d_controller:
+    dependency: "direct main"
+    description:
+      name: flutter_3d_controller
+      sha256: "4c2ca198974a04b688e48c527b162229bd05a5d12f96f1e0913a49aee7d6d68b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -721,10 +729,10 @@ packages:
     dependency: "direct main"
     description:
       name: model_viewer_plus
-      sha256: "633efbd081efe9af8b149c5553fa1e3e83a298ccc151955b0fe9d56a666943be"
+      sha256: daeee3c498ece539125933e233252aebdc0b6d842538efb7061f7eaf3b97939e
       url: "https://pub.dev"
     source: hosted
-    version: "1.7.2"
+    version: "1.7.0"
   nested:
     dependency: transitive
     description:
@@ -733,6 +741,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  o3d:
+    dependency: "direct main"
+    description:
+      name: o3d
+      sha256: "64e45cafa45db2a233f1c2f7187388d33c59b7f7d0fa46af1eb79e16a6936276"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   path:
     dependency: transitive
     description:
@@ -938,6 +954,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  social_share:
+    dependency: "direct main"
+    description:
+      name: social_share
+      sha256: eb19a0f6f5a29c7bb71e5bb1991145eb52472184363b6e2da70695befd8be041
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.1"
   source_span:
     dependency: transitive
     description:

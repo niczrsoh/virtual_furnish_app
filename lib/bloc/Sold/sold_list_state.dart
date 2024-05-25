@@ -2,7 +2,6 @@ part of 'sold_list_bloc.dart';
 
 sealed class SoldListState {
   const SoldListState();
-  
 }
 sealed class SoldListActionState extends SoldListState{}
 sealed class SoldListConditionState extends SoldListState{}
@@ -25,10 +24,6 @@ final class SoldListDataFetchedByNameSuccess extends SoldListState {
 
 final class SoldListFetctedFail extends SoldListState {}
 
-final class SoldListDataFetchedByTitleSuccess extends SoldListState {
-  final List<MarketplaceProductModel> soldListData;
-  SoldListDataFetchedByTitleSuccess({required this.soldListData});
-}
 
 //delete item
 final class DeleteItemSuccess extends SoldListActionState {}

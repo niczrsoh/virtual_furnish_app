@@ -1,17 +1,22 @@
 
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cube/flutter_cube.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:o3d/o3d.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:virtual_furnish_app/bloc/Sold/create_selling_item_bloc.dart';
 import 'package:virtual_furnish_app/data/model/MarketplaceProduct/product_model.dart';
@@ -37,7 +42,7 @@ class _CreateSellingItemPageState extends State<CreateSellingItemPage> {
    TextEditingController priceController = TextEditingController();
 
    TextEditingController descriptionController = TextEditingController();
-
+    Flutter3DController controller = Flutter3DController();
    TextEditingController locationController = TextEditingController();
     bool isButtonDisabled = false;
   List<File> selectedImages = [];
@@ -48,11 +53,11 @@ class _CreateSellingItemPageState extends State<CreateSellingItemPage> {
 
   File? selectedVideo;
   Image? _thumbnailImage;
-
+  Uint8List ? newPath;
   bool have3DModel = false;
   bool haveVideo = false;
 
-  FilePickerResult? threeDimensionModel;
+  File? threeDimensionModel;
   //video 
   Future<void> generateThumbnail(String videoPath) async {
     final uint8list = await VideoThumbnail.thumbnailData(
@@ -99,11 +104,21 @@ class _CreateSellingItemPageState extends State<CreateSellingItemPage> {
   }
 
   Future<void> _add3DModel() async {
-    FilePickerResult? model = await FilePicker.platform.pickFiles(type: FileType.any);
-    setState(() {
-      threeDimensionModel = model!;
-    });
-    print('path: : ${threeDimensionModel!.toString()}');
+FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.any);
+if (result != null) {
+  PlatformFile file = result.files.first;
+  final appDir = await getApplicationDocumentsDirectory();
+  final filePath = '${appDir.path}/${file.name}';
+  
+  // Copy the selected file to the app's documents directory
+    final newFile = await File(file.path!).copy(filePath);
+    final newPath = await File(newFile!.path ?? '').readAsBytes();
+
+  setState(() {
+    threeDimensionModel = newFile;
+    this.newPath = newPath;
+  });
+}
   }
   @override
   Widget build(BuildContext context) {
@@ -309,11 +324,10 @@ class _CreateSellingItemPageState extends State<CreateSellingItemPage> {
                             )
                             :(threeDimensionModel!=null)?Container(
                               height: 200,
-                              child: Cube(
-                                        onSceneCreated: (Scene scene) {
-                                          scene.world.add(Object(fileName: threeDimensionModel?.files[0].path, scale: Vector3(8,8,8), backfaceCulling: false, isAsset: false,));
-                                        }),
-                            ):
+                              child: 
+                            //  ModelViewer(src:  base64Encode(newPath!),)
+                              O3D(src: base64Encode(newPath!),),
+                                                  ):
                             SizedBox(height: 10),
                          Row(
                             children: [
@@ -370,7 +384,7 @@ class _CreateSellingItemPageState extends State<CreateSellingItemPage> {
                                 sellerID: AuthRepo.getCurrentUserId()!,
                                 video: selectedVideo?.path,
                                 price: double.parse(priceController.text.trim()),
-                                threeDimensionModel: threeDimensionModel?.files[0].path,
+                                threeDimensionModel: threeDimensionModel?.path,
                               );
                               //for dev checking
                               debugPrint(productModel.toString());
@@ -386,7 +400,7 @@ class _CreateSellingItemPageState extends State<CreateSellingItemPage> {
                                 video: selectedVideo?.path,
                                 sellerID: AuthRepo.getCurrentUserId()!,
                                 buyers: 0,
-                                threeDimensionModel: threeDimensionModel?.files[0].path,
+                                threeDimensionModel: threeDimensionModel?.path,
                               ));}
                             },
                             buttonText: 'Create Selling Item',

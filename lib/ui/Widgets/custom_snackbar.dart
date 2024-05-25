@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:virtual_furnish_app/ui/Styles/color_styles.dart';
 
 class CustomSnackbar {
@@ -9,7 +10,7 @@ class CustomSnackbar {
           children: [
             CircularProgressIndicator(color: CustomColor.vfPrimaryColor),
             const SizedBox(width: 16),
-            Text(message??"loading..."),
+            Flexible(child: Text(message??"loading...")),
           ],
         ),
       ),
@@ -39,7 +40,7 @@ class CustomSnackbar {
         content: Row(
           children: [
             Icon(Icons.error,
-                color: CustomColor.secondaryDarkAppColor),
+                color: CustomColor.primaryBackgroundColor),
             const SizedBox(width: 16),
             Flexible(child: Text(message?? "Failed")),
           ],

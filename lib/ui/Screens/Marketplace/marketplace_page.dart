@@ -128,18 +128,12 @@ class MarketplacePage extends StatelessWidget {
                           child: Column(
                             children: [
                               Container(
-                                //add border
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 height: 50,
                                 width: 54,
                                 child: Center(
-                                  // child: SvgPicture.asset(
-                                  //   'assets/images/cat_table.svg',
-                                  //   width: 50,
-                                  //   height: 50,
-                                  // ),
                                    child: Image(image: Image.asset(categoryImages[index]).image,fit: BoxFit.cover,),
                                 ),
                               ),

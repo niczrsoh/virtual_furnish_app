@@ -33,4 +33,6 @@ class PagePath {
   static const String pathSellerRegisterList = '/seller_register_list';
   static const String pathSellingOrder = '/selling_order';
   static const String pathOrderDetail = '/order_detail';
+  static const String pathARScreenShot = '/ar_screenshot';
+  static const String pathARVideoImages = '/ar_video_images';
 }

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:virtual_furnish_app/bloc/ARSpace/ar_media_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/marketplace_bloc.dart';
 import 'package:virtual_furnish_app/bloc/OrderManagement/selling_order_bloc.dart';
@@ -15,6 +16,7 @@ import 'package:virtual_furnish_app/bloc/Profile/bloc/user_profile_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/create_selling_item_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/sold_list_bloc.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_flutter_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_video_image_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/cart_product_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/OrderManagement/selling_order_page.dart';
@@ -47,6 +49,7 @@ CartBloc cartBloc = CartBloc()..add(LoadCart());
 CreateSellingItemBloc createSellingItemBloc = CreateSellingItemBloc();
 SellingOrderBloc sellingOrderBloc = SellingOrderBloc()..add(FetchItems());
 SoldListBloc soldListBloc = SoldListBloc()..add(SoldListDataFetched());
+ArMediaBloc arMediabloc = ArMediaBloc()..add(ArMediaLoad());
 MarketplaceBloc marketplaceBloc = MarketplaceBloc()
   ..add(FetchMostSellingItems());
 List<Widget> bottomNavScreen = [
@@ -59,7 +62,7 @@ List<Widget> bottomNavScreen = [
     child: CartProductPage(cartBloc: cartBloc),
   ),
   //RemoteObject(),
- ARFlutterPage(),
+  ARVideoImagesPage(bloc: arMediabloc),
   //ARSpacePage(),
   Text('index 3: message'),
   BlocProvider<UserProfileBloc>.value(
@@ -69,7 +72,7 @@ List<Widget> bottomNavScreen = [
 ];
 List<Widget> sellerBottomNavScreen = [
   BlocProvider<SoldListBloc>.value(
-    value: soldListBloc,
+    value: soldListBloc..add(SoldListDataFetched()),
     child: SoldListPage(
       soldListBloc: soldListBloc,
     ),
@@ -129,6 +132,11 @@ class _MasterPageState extends State<MasterPage> {
                 unselectedItemColor: Colors.grey,
                 currentIndex: tabIndex,
                 onTap: (index) {
+                  if(userType == "seller"){
+                    if(index == 0){
+                      soldListBloc.add(SoldListDataFetched());
+                    }
+                  }
                   setState(() {
                     tabIndex = index;
                   });

@@ -24,12 +24,12 @@ class _ThreeDimensionObjectPageState extends State<ThreeDimensionObjectPage> {
       body: Center(
         child: ModelViewer(
           backgroundColor: Color.fromARGB(0xFF, 0xEE, 0xEE, 0xEE),
-          src: "https://firebasestorage.googleapis.com/v0/b/virtualfurnish-93c69.appspot.com/o/TestItems%2FSmiling%20Face.glb?alt=media&token=c5e122fc-66d3-4cda-a223-0d63fd358ecd",
+          src: widget.objectPath!,
           alt: 'A 3D model of an astronaut',
           ar: true,
           arModes: ['scene-viewer', 'webxr', 'quick-look'],
           autoRotate: true,
-          iosSrc: 'https://firebasestorage.googleapis.com/v0/b/virtualfurnish-93c69.appspot.com/o/TestItems%2FSmiling%20Face.glb?alt=media&token=c5e122fc-66d3-4cda-a223-0d63fd358ecd',
+          iosSrc: widget.objectPath!,
           disableZoom: true,
         ),
       ),

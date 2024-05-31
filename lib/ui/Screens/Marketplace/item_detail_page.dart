@@ -69,7 +69,9 @@ class ItemDetailsPage extends StatelessWidget {
                   children: [
                     SecondaryCustomButton(
                         width: mq.width * 0.4,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/chat_room', arguments: {"opponentID": currentState.itemData.sellerID});
+                        },
                         buttonText: 'Chat',
                         isDisabled: isButtonDisabled),
                     CustomButton(

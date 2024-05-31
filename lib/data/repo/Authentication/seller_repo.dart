@@ -59,7 +59,9 @@ class SellerRepo{
   static Future<SellerAccountModel> getSellerInfo(String id) async {
     try{
       DocumentSnapshot documentSnapshot = await _sellerCollection.doc(id).get();
-      return SellerAccountModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      SellerAccountModel model = SellerAccountModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      model.id = documentSnapshot.id;
+      return model;
     }
     catch(e){
       throw e;

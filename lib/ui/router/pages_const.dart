@@ -35,4 +35,5 @@ class PagePath {
   static const String pathOrderDetail = '/order_detail';
   static const String pathARScreenShot = '/ar_screenshot';
   static const String pathARVideoImages = '/ar_video_images';
+  static const String pathChatRoom = '/chat_room';
 }

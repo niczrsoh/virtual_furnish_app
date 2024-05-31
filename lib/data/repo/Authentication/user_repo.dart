@@ -7,6 +7,27 @@ import 'package:virtual_furnish_app/data/repo/firebaseStorageRepo.dart';
 class UserRepo{
 
    static final CollectionReference _userCollection = FirebaseFirestore.instance.collection("User");
+    static final CollectionReference _sellerCollection = FirebaseFirestore.instance.collection("SellAccount");
+   //get current user type
+    static Future<String> getCurrentUserType() async {
+        try{
+        String id = FirebaseAuth.instance.currentUser!.uid;
+       DocumentSnapshot documentSnapshot = await _userCollection.doc(id).get();
+      if(documentSnapshot.exists){
+        return "user";
+      }else{
+        DocumentSnapshot sellerdocumentSnapshot = await _sellerCollection.doc(id).get();
+        if(sellerdocumentSnapshot.exists){
+          return "seller";
+        }else{
+          return "none";
+        }
+      }
+    }
+    catch(e){
+      return e.toString();
+    }
+    }
   //add new user using the user model
   static Future<String> saveUser( UserModel userModel) async {
     try{
@@ -25,7 +46,9 @@ class UserRepo{
       return UserModel(id: FirebaseAuth.instance.currentUser!.uid, username: "Guest", email: "Guest", age: 0, profilePic: "", contact: "", status: "Guest");
     }else{
       DocumentSnapshot documentSnapshot = await _userCollection.doc(id).get();
-      return UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);}}
+      UserModel userModel = UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      userModel.id = documentSnapshot.id;
+      return userModel;}}
     catch(e){
       throw e;
     }

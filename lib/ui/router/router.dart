@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:virtual_furnish_app/bloc/ARSpace/ar_controller_bloc.dart';
 import 'package:virtual_furnish_app/bloc/ARSpace/ar_media_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Authentication/Login/login_bloc.dart';
+import 'package:virtual_furnish_app/bloc/ChatAndNotification/manage_messages_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Home/home_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/checkout_bloc.dart';
@@ -30,6 +31,7 @@ import 'package:virtual_furnish_app/ui/Screens/Authentication/login_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/login_phone.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/otp_verification_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/register_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/ChatAndNotification/chat_room_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Common/three_dimension_object_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Common/video_player_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Home/home_page.dart';
@@ -62,6 +64,7 @@ class AppRouter {
   static final PaymentBloc paymentBloc = PaymentBloc();
   static final ItemDetailBloc itemDetailBloc = ItemDetailBloc();
   static final CartBloc cartBloc = CartBloc();
+  static final ManageMessagesBloc manageMessagesBloc = ManageMessagesBloc();
   static final OrderDetailBloc orderDetailBloc = OrderDetailBloc();
   static final AuthenticationProvider authProvider = AuthenticationProvider();
   static final LoginBloc loginBloc = LoginBloc();
@@ -155,6 +158,17 @@ class AppRouter {
       //     settings: settings,
       //     builder: (_) =>  MarketplacePage(),
       //   );
+      case PagePath.pathChatRoom:
+      args?['from'] == 'itemDetail'?
+        manageMessagesBloc.add(DirectToChatRoomEvent(opponentID: args?['opponentID'])):
+        manageMessagesBloc.add(OpenChatRoomEvent(chatID: args?['chatID']));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider<ManageMessagesBloc>.value(
+            value: manageMessagesBloc,
+            child:  ChatRoomPage(bloc: manageMessagesBloc,),
+          ),
+        );
       case PagePath.pathItemList:
         if (args?['title'] != null) {
           itemListBloc.add(ItemListFetchedByTitle(title: args?['title']));

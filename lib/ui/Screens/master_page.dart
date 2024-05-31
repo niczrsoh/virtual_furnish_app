@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/ARSpace/ar_media_bloc.dart';
+import 'package:virtual_furnish_app/bloc/ChatAndNotification/manage_messages_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/cart_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/marketplace_bloc.dart';
 import 'package:virtual_furnish_app/bloc/OrderManagement/selling_order_bloc.dart';
@@ -17,6 +18,7 @@ import 'package:virtual_furnish_app/bloc/Sold/create_selling_item_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/sold_list_bloc.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_flutter_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/AR%20Space/ar_video_image_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/ChatAndNotification/chat_list_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/cart_product_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/OrderManagement/selling_order_page.dart';
@@ -25,6 +27,7 @@ import 'package:virtual_furnish_app/ui/Screens/Profile/user_profile_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Sold/create_selling_item_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Sold/sold_list_page.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_loading_bar.dart';
+import 'package:virtual_furnish_app/ui/router/router.dart';
 
 List<BottomNavigationBarItem> bottomNavBars = const <BottomNavigationBarItem>[
   BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
@@ -64,7 +67,9 @@ List<Widget> bottomNavScreen = [
   //RemoteObject(),
   ARVideoImagesPage(bloc: arMediabloc),
   //ARSpacePage(),
-  Text('index 3: message'),
+  BlocProvider<ManageMessagesBloc>.value(
+    value: AppRouter.manageMessagesBloc..add(FetchChatRoomListEvent()),
+    child: ChatListPage(bloc: AppRouter.manageMessagesBloc),),
   BlocProvider<UserProfileBloc>.value(
     value: userProfileBloc,
     child: UserProfilePage(userProfileBloc: userProfileBloc),
@@ -86,7 +91,9 @@ List<Widget> sellerBottomNavScreen = [
     value: createSellingItemBloc,
     child: CreateSellingItemPage(createSellingItemBloc: createSellingItemBloc),
   ),
-  Text('index 3: message'),
+  BlocProvider<ManageMessagesBloc>.value(
+    value: AppRouter.manageMessagesBloc..add(FetchChatRoomListEvent()),
+    child: ChatListPage(bloc: AppRouter.manageMessagesBloc),),
   BlocProvider<SellerProfileBloc>.value(
     value: sellerProfileBloc,
     child: SellerProfilePage(sellerProfileBloc: sellerProfileBloc),

@@ -11,10 +11,12 @@ class ItemDetailFetchedSuccess extends ItemDetailState {
   final MarketplaceProductModel itemData;
   final SellerAccountModel sellerData;
   final UserModel userData;
+  final bool isGuest;
   ItemDetailFetchedSuccess({
     required this.itemData,
     required this.sellerData,
     required this.userData,
+    required this.isGuest,
   });
 }
 class ItemDetailFetctedFail extends ItemDetailState {}

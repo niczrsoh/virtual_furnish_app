@@ -50,7 +50,7 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
       contact: event.contact??"",
       age: event.age??0,
       status: event.status??"",
-      profilePic: event.profilePic,
+      profilePic: event.profilePic??"",
     );
     String message = await UserRepo.editUser(userModel);
     if(message=="User Updated"){

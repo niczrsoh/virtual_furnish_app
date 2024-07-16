@@ -53,3 +53,4 @@ final class SelectCartProduct extends CartEvent {
 final class CartProductPageButtonPressed extends CartEvent {
   CartProductPageButtonPressed();
 }
+

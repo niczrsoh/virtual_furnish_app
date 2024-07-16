@@ -10,7 +10,8 @@ sealed class OrderDetailState extends Equatable {
 final class OrderDetailInitial extends OrderDetailState {}
 
 final class OrderDetailLoading extends OrderDetailState {}
-
+class OrderDetailActionState extends OrderDetailState {}
+class OrderDetailConfirmed extends OrderDetailActionState {}
 final class OrderDetailLoaded extends OrderDetailState {
   final List<OrderStatus> orders;
   final String type;
@@ -18,7 +19,7 @@ final class OrderDetailLoaded extends OrderDetailState {
   OrderDetailLoaded(this.orders, this.type, this.product_model);
 }
 
-final class OrderDetailError extends OrderDetailState {
+final class OrderDetailError extends OrderDetailActionState {
   final String message;
 
   OrderDetailError(this.message);

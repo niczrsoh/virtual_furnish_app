@@ -12,6 +12,7 @@ import '../../../bloc/Authentication/Register/register_bloc.dart';
 class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});
   RegisterBloc registerBloc = RegisterBloc();
+  bool isButtonEnabled = true;
   static final TextEditingController _nameController = TextEditingController();
 
   static final TextEditingController _emailController = TextEditingController();
@@ -49,18 +50,16 @@ class RegisterPage extends StatelessWidget {
           bloc: registerBloc,
           listener: (context, state) {
             if (state is RegisterSuccess) {
+              isButtonEnabled = true;
               CustomSnackbar.showSuccessSnackbar(context, state.message);
               Navigator.pop(context);
               registerBloc.add(const RegisterPageEnableButton(isButtonEnabled: true));
             } else if (state is RegisterFail) {
+              isButtonEnabled = true;
               CustomSnackbar.showFailSnackbar(context, state.message);
             }
           },
           builder: (context, state) {
-                               bool isButtonEnabled = true;
-                   if(state is RegisterPageButtonEnabled && state.isButtonEnabled == false){
-                     isButtonEnabled = false;
-                   }
             return Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -77,14 +76,26 @@ class RegisterPage extends StatelessWidget {
                             labelText: 'Name',
                             hintText: 'Enter your name',
                           ),
+                          onEditingComplete: () {
+                              if (_nameController == null || _nameController.text.isEmpty) {
+                              CustomSnackbar.showFailSnackbar(context, 'Please enter your name');
+                            } else if (_nameController.text.length < 6) {
+                              CustomSnackbar.showFailSnackbar(context, 'Name is too short');
+                            } else if (!_nameController.text.contains(RegExp(r'^[a-zA-Z]')) ) {
+                              CustomSnackbar.showFailSnackbar(context, 'Name missing alphabet characters');
+                            } else if (_nameController.text.length>50 ) {
+                              CustomSnackbar.showFailSnackbar(context, 'Name is too long');
+                            } 
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your name';
-                            } else if (value.length < 6 || value.length > 20) {
-                              return 'Length of name should be between 6 and 20 characters';
-                            } else if (!RegExp(r'^[a-zA-Z]+$')
-                                .hasMatch(value)) {
+                            } else if (value.length < 6) {
+                              return 'Name is too short';
+                            } else if (!value.contains(RegExp(r'^[a-zA-Z]')) ) {
                               return 'Name missing alphabet characters';
+                            } else if (value.length>50 ) {
+                              return 'Name is too long';
                             }
                             return null;
                           },
@@ -100,14 +111,29 @@ class RegisterPage extends StatelessWidget {
                             labelText: 'Email',
                             hintText: 'Enter your email',
                           ),
+                           onEditingComplete: () {
+                          if (_emailController.text.isEmpty) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter your email address.');
+                          }else if(!_emailController.text.contains('@') || _emailController.text.split('@').length>2) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter a valid email address.');
+                          }else if(_emailController.text.startsWith('@')) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter a valid email address.');
+                          }else if(_emailController.text.split('@').length<1) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter a valid email address.');
+                          }},
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your email';
-                            } else if (!value.contains('@') ||
-                                !value.contains('.') ||
-                                !RegExp(r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$')
-                                    .hasMatch(value)) {
-                              return 'Email is invalid. Plaese enter a valid email';
+                            } else if (!value.contains('@') || value.split('@').length>2) {
+                              return 'Please enter a valid email address';
+                            } else if (value.startsWith('@')) {
+                              return 'Please enter a valid email address';
+                            } else if (value.split('@').length<1) {
+                              return 'Please enter a valid email address';
                             }
                             return null;
                           },
@@ -123,18 +149,37 @@ class RegisterPage extends StatelessWidget {
                             labelText: 'Password',
                             hintText: 'Enter your password',
                           ),
+                            onEditingComplete: () {
+                          if (_passwordController.text.isEmpty) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter your password.');
+                          }else if(_passwordController.text.length<6) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Password	is	too short, try again.');
+                          }else if(!_passwordController.text.contains(RegExp(r'[0-9]'))&& !_passwordController.text.contains(RegExp(r'[a-z]|[A-Z]'))) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Password missing alphabet and number.');
+                          }
+                          else if(!_passwordController.text.contains(RegExp(r'[0-9]'))) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Password missing number.');
+                                 //missing character
+                          }else if(!_passwordController.text.contains(RegExp(r'[a-z]|[A-Z]'))) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Password missing alphabet.');
+                          }},
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your password';
-                            } else if (value.length < 5 || value.length > 30) {
-                              return 'Length of password should be between 6 and 30 characters';
-                            } 
-                            // else if (!RegExp(r'^[a-z]+$')
-                            //     .hasMatch(value)) {
-                            //   return 'Password missing alphabet characters';
-                            // } else if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                            //   return 'Password missing numeric characters';
-                            // }
+                            } else if (value.length < 6) {
+                              return 'Password is too short';
+                            } else if (!value.contains(RegExp(r'[0-9]'))&& !value.contains(RegExp(r'[a-z]|[A-Z]'))) {
+                              return 'Password missing alphabet and number';
+                            } else if (!value.contains(RegExp(r'[0-9]'))) {
+                              return 'Password missing number';
+                            } else if (!value.contains(RegExp(r'[a-z]|[A-Z]'))) {
+                              return 'Password missing alphabet';
+                            }
                             return null;
                           },
                         ),
@@ -149,11 +194,20 @@ class RegisterPage extends StatelessWidget {
                               labelText: 'Confirm Password',
                               hintText: 'Confirm your password',
                             ),
+                            onEditingComplete: () {
+                              if (_confirmPasswordController.text.isEmpty) {
+                                CustomSnackbar.showFailSnackbar(
+                                    context, 'Please fill up the confirm password text field.');
+                              } else if (_confirmPasswordController.text != _passwordController.text) {
+                                CustomSnackbar.showFailSnackbar(
+                                    context, 'Different	with	the filled in password.');
+                              }
+                            },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
+                                return 'Please fill up the confirm password text field.';
                               } else if (value != _passwordController.text) {
-                                return 'Password does not match';
+                                return 'Different	with	the filled in password.';
                               }
                             }),
 
@@ -180,9 +234,16 @@ class RegisterPage extends StatelessWidget {
                         CustomButton(
                           isDisabled: !isButtonEnabled,
                           onPressed: () {
-                            registerBloc.add(RegisterPageEnableButton(isButtonEnabled: false));
+                            //validate the form first
+                            //if the form is valid, then register the user
+                            //if the form is not valid, show an error message
+                            if(_formKey.currentState!.validate()){
                             CustomSnackbar.showLoadingSnackbar(context,'Register user ...');
-                            addNewUser();
+                            addNewUser(context);
+                            }else{
+                              CustomSnackbar.showFailSnackbar(context, 'Please check again the required fields');
+                            }
+
                           },
                           buttonText: 'Sign Up',
                         ),
@@ -201,7 +262,7 @@ class RegisterPage extends StatelessWidget {
     );
   }
 
-  void addNewUser() {
+  void addNewUser(BuildContext context) {
        if (_formKey.currentState!.validate()) {
       registerBloc.add(RegisterCreation(
         name: _nameController.text,
@@ -209,6 +270,7 @@ class RegisterPage extends StatelessWidget {
         password: _passwordController.text,
         confirmPassword: _confirmPasswordController.text,
       ));
+      CustomSnackbar.showLoadingSnackbar(context, 'Please verify your email address');
     }
   }
 }

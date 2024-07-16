@@ -60,7 +60,8 @@ class MarketplaceRepo{
         productModel.video = url;
       }
       if(productModel.threeDimensionModel!=null){
-        String url = await FirebaseStorageRepo.uploadFile(path: productModel.threeDimensionModel!, category: "MarketplaceProduct/3dModel/${productModel.name}");
+          String url = await FirebaseStorageRepo.uploadFile(path: productModel.threeDimensionModel!, category: "MarketplaceProduct/3dModel");
+      //  String url = await FirebaseStorageRepo.uploadFile(path: productModel.threeDimensionModel!, category: "MarketplaceProduct/3dModel/${productModel.name}");
         productModel.threeDimensionModel = url;
       }
       _productCollection.doc().set(productModel.toJson());
@@ -214,8 +215,17 @@ class MarketplaceRepo{
   //get all marketplace products by title 
   static Future<List<MarketplaceProductModel>> fetchMarketplaceProductByTitle(String title) async {
     try{
-    QuerySnapshot querySnapshot = await _productCollection.get();
+    QuerySnapshot querySnapshot;
     List<MarketplaceProductModel> filters = [];
+        //get user seller id if have
+    String? id = AuthRepo.getCurrentUserId();
+    //get seller id
+    UserModel userId = await UserRepo.getUser(id!);
+    if(userId.sell!=null && userId.sell!.isNotEmpty){
+      querySnapshot = await _productCollection
+      .where("sellerID", isNotEqualTo: userId.sell).get();}else{
+        querySnapshot = await _productCollection.get();
+      }
     //using for 
     for(DocumentSnapshot doc in querySnapshot.docs){
       if(doc["name"].toString().contains(title.toLowerCase())){
@@ -232,8 +242,17 @@ class MarketplaceRepo{
   //get all marketplace products by category
   static Future<List<MarketplaceProductModel>> fetchMarketplaceProductByCategory(String category) async {
   try{
-    QuerySnapshot querySnapshot = await _productCollection.get();
+    QuerySnapshot querySnapshot;
     List<MarketplaceProductModel> filters = [];
+    //get user seller id if have
+    String? id = AuthRepo.getCurrentUserId();
+    //get seller id
+    UserModel userId = await UserRepo.getUser(id!);
+    if(userId.sell!=null && userId.sell!.isNotEmpty){
+      querySnapshot = await _productCollection
+      .where("sellerID", isNotEqualTo: userId.sell).get();}else{
+        querySnapshot = await _productCollection.get();
+      }
     //using for 
     for(DocumentSnapshot doc in querySnapshot.docs){
       if(doc["category"].toString().toLowerCase() == category.toLowerCase()){

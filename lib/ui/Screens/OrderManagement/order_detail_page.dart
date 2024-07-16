@@ -4,26 +4,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/OrderManagement/order_detail_bloc.dart';
 import 'package:virtual_furnish_app/data/model/OrderManagement/order_status_model.dart';
+import 'package:virtual_furnish_app/main.dart';
+import 'package:virtual_furnish_app/ui/Widgets/custom_button.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_loading_bar.dart';
+import 'package:virtual_furnish_app/ui/Widgets/custom_snackbar.dart';
+import 'package:virtual_furnish_app/ui/Widgets/secondary_custom_button.dart';
 
 class OrderDetailPage extends StatelessWidget {
   OrderDetailPage({super.key,  required this.orderBloc});
    final OrderDetailBloc orderBloc;
-  final tabs = <Tab>[
-    Tab(text: 'To Process'),
-    Tab(text: 'To Shipped'),
-    Tab(text: 'To Delivered'),
-    Tab(text: 'To Receive'),
-  ];
-  List<Widget> tabPages = <Widget>[
-    TabView(type: "process"),
-    TabView(type: "shipped"),
-   TabView(type: "delivered"),
-   TabView(type: "received"),
-  ];
-  List<String> tabTypes = ['process', 'shipped', 'delivered', 'received'];
+
+  List<String> tabTypes = ['process', 'shipped','received','completed'];
   @override
   Widget build(BuildContext context) {
+      final tabs = <Tab>[
+    Tab(text: 'To Process'),
+    Tab(text: 'To Shipped'),
+    Tab(text: 'To Receive'),
+    Tab(text: 'Completed')
+  ];
+  List<Widget> tabPages = <Widget>[
+    TabView(type: "process", orderBloc: orderBloc,),
+    TabView(type: "shipped", orderBloc: orderBloc,),
+   TabView(type: "received", orderBloc: orderBloc,),
+   TabView(type: "completed", orderBloc: orderBloc,)
+  ];
     return DefaultTabController(
       length: 4,
       child: Scaffold(
@@ -37,7 +42,8 @@ class OrderDetailPage extends StatelessWidget {
           ),
         ),
         body:  TabBarView(
-            children:  tabPages,
+            children:  tabPages
+           
           ),
       ),
     );
@@ -45,17 +51,27 @@ class OrderDetailPage extends StatelessWidget {
 }
 
 class TabView extends StatelessWidget {
-  const TabView({
+   TabView({
     super.key,
+    required this.orderBloc,
     required this.type,
   });
+   OrderDetailBloc orderBloc;
   final String type;
-
+  bool isButtonDisabled=false;
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<OrderDetailBloc, OrderDetailState>(
+      listenWhen: (previous, current) => current is OrderDetailActionState,
+      buildWhen: (previous, current) => current is !OrderDetailActionState,
     listener: (context, state) {
       // TODO: implement listener
+      if (state is OrderDetailError) {
+        CustomSnackbar.showFailSnackbar(context, state.message);
+      }
+      else if (state is OrderDetailConfirmed) {
+        CustomSnackbar.showSuccessSnackbar(context, "Item Confirmed");
+      }
     },
     builder: (context, state) {
       switch(state.runtimeType){
@@ -87,8 +103,36 @@ class TabView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if((order.trackingNumber!=""&&order.trackingNumber!=null))
-                    Text("Tracking No: ${order.trackingNumber}"??"fail to load tracking number"),
-                    Text(order.latestTransaction??"fail to load latest transaction"),
+                    if (order.status!="completed") Text("Tracking No: ${order.trackingNumber}"??"fail to load tracking number"),
+                   if (order.status!="completed") Text(order.latestTransaction??"fail to load latest transaction"),
+                    (order.status=="received")?Text("Please tap on the order received button after receiving your item"??"fail to load received date"):Container(),
+                    // a button for received
+                    SizedBox(height: 10),
+                    
+                    if (order.status=="received")
+                    SecondaryCustomButton(
+                      isDisabled: isButtonDisabled,
+                      buttonText: 'Order Received',
+                      onPressed: () {
+                        orderBloc.add(ConfirmItem(order.id!));
+                      },
+                    ),
+                    if (order.status=="completed")...[
+                      Text("Order Completed \n Please rate the product"),
+                      SizedBox(height: 10),
+                      Center(
+                        child: SecondaryCustomButton(
+                        isDisabled: isButtonDisabled,
+                        buttonText: 'Rate',
+                         width: mq.width*0.3,
+                        onPressed: () {
+                                             
+                        
+                        },
+                                            ),
+                      ),
+                    ],
+                    
                   ],
                 ),
               );

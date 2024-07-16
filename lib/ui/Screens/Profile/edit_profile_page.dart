@@ -12,6 +12,7 @@ import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/main.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_alert_dialog.dart';
 import 'package:virtual_furnish_app/ui/Widgets/custom_button.dart';
+import 'package:virtual_furnish_app/ui/Widgets/custom_snackbar.dart';
 
 class EditProfilePage extends StatefulWidget {
   final bloc;
@@ -33,7 +34,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   int age = 0;
 
   //key
-  final GlobalKey<FormState> _usernameKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _profileFormKey = GlobalKey<FormState>();
 
   bool isButtonEnabled = true;
 
@@ -59,6 +60,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             title: const Text('Edit Profile'),
           ),
           body: BlocConsumer<EditProfileBloc, EditProfileState>(
+            
             listener: (context, state) {
               if (state is UserProfileFound && isFirstTime) {
                   setState(() {
@@ -71,12 +73,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   status = state.userModel.status ?? "User";
                   age = state.userModel.age ?? 0;
               } else if (state is EditProfileSuccess) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(state.message)));
+                CustomSnackbar.showSuccessSnackbar(context, state.message);
                 Navigator.pop(context,"update success");
               } else if (state is EditProfileError) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(state.errorMessage)));
+                 CustomSnackbar.showFailSnackbar(context, state.errorMessage);
               }
             },
             builder: (context, state) {
@@ -89,153 +89,199 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       FocusScope.of(context).unfocus();
                     },
                     child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 40,
-                            backgroundImage: (profilePic != null && profilePic!.isNotEmpty)
-                                ? (profilePic!.contains("https://"))
-                                    ? Image.network(profilePic!).image
-                                    : Image.file(File(profilePic!)).image
-                                : Image.asset('assets/images/profilepic-anonymous.jpg')
-                                    .image,
-                          ),
-                          TextButton(
-                              onPressed: () {
-                                showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) {
-                                      return Container(
-                                        height: mq.height * 0.2,
-                                        padding: EdgeInsets.all(10),
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              "Select a profile picture",
-                                            ),
-                                            ListTile(
-                                              title: Text("Take a Picture"),
-                                              onTap: () {
-                                                changeProfilePicture(
-                                                    ImageSource.camera);
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                            ListTile(
-                                              title: Text("Choose from Gallery"),
-                                              onTap: () {
-                                                changeProfilePicture(
-                                                    ImageSource.gallery);
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    });
-                              },
-                              child: Text(
-                                "Change Profile Picture",
-                                style: TextStyle(color: Colors.black),
-                              )),
-                          ListTile(
-                            title: const Text('Username'),
-                            subtitle: TextFormField(
-                              controller: usernameController,
-                              decoration: InputDecoration(
-                                hintText: 'Enter your username',
+                      child: Form(
+                        key: _profileFormKey,
+                        child: Column(
+                          children: [
+                            CircleAvatar(
+                              radius: 40,
+                              backgroundImage: (profilePic != null && profilePic!.isNotEmpty)
+                                  ? (profilePic!.contains("https://"))
+                                      ? Image.network(profilePic!).image
+                                      : Image.file(File(profilePic!)).image
+                                  : Image.asset('assets/images/profilepic-anonymous.jpg')
+                                      .image,
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return Container(
+                                          height: mq.height * 0.2,
+                                          padding: EdgeInsets.all(10),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "Select a profile picture",
+                                              ),
+                                              ListTile(
+                                                title: Text("Take a Picture"),
+                                                onTap: () {
+                                                  changeProfilePicture(
+                                                      ImageSource.camera);
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                              ListTile(
+                                                title: Text("Choose from Gallery"),
+                                                onTap: () {
+                                                  changeProfilePicture(
+                                                      ImageSource.gallery);
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      });
+                                },
+                                child: Text(
+                                  "Change Profile Picture",
+                                  style: TextStyle(color: Colors.black),
+                                )),
+                            ListTile(
+                              title: const Text('Username'),
+                              subtitle: TextFormField(
+                                controller: usernameController,
+                                decoration: InputDecoration(
+                                  hintText: 'Enter your username',
+                                ),
+                                  validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a username before updating it.';
+                              } else if (value.length < 6) {
+                                return 'The username is too short.';
+                              } else if (!value.contains(RegExp(r'^[a-zA-Z]')) ) {
+                                return 'Please enters a valid username';
+                              } else if (value.length>50 ) {
+                                return 'The username is too long.';
+                              }
+                              return null;
+                            },
                               ),
                             ),
-                          ),
-                          ListTile(
-                            title: const Text('Email'),
-                            subtitle: TextField(
-                              controller: emailController,
-                              decoration: InputDecoration(
-                                hintText: 'Enter your email',
+                            ListTile(
+                              title: const Text('Email'),
+                              subtitle: TextFormField(
+                                controller: emailController,
+                                decoration: InputDecoration(
+                                  hintText: 'Enter your email',
+                                ),
+                              validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your email';
+                              } else if (!value.contains('@') || value.split('@').length>2) {
+                                return 'Please enter a valid email address';
+                              } else if (value.startsWith('@')) {
+                                return 'Please enter a valid email address';
+                              } else if (value.split('@').length<1) {
+                                return 'Please enter a valid email address';
+                              }
+                              return null;
+                            },
                               ),
                             ),
-                          ),
-                          ListTile(
-                            title: const Text('Phone Number'),
-                            subtitle: Row(
-                              children: [
-                                Expanded(
-                                    flex: 1,
-                                    child: Text(
-                                      "+60 - ",
-                                      style: TextStyle(fontSize: 15),
-                                    )),
-                                Expanded(
-                                  flex: 6,
-                                  child: TextFormField(
-                                    controller: contactController,
-                                    inputFormatters: [
-                                      //only number
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(10),
-                                    ],
-                                    keyboardType: TextInputType.phone,
-                                    decoration: InputDecoration(
-                                      hintText: 'Enter your phone number',
+                            ListTile(
+                              title: const Text('Phone Number'),
+                              subtitle: Row(
+                                children: [
+                                  Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        "+60 - ",
+                                        style: TextStyle(fontSize: 15),
+                                      )),
+                                  Expanded(
+                                    flex: 6,
+                                    child: TextFormField(
+                                      controller: contactController,
+                                      inputFormatters: [
+                                        //only number
+                                        FilteringTextInputFormatter.digitsOnly,
+                                        LengthLimitingTextInputFormatter(10),
+                                      ],
+                                      keyboardType: TextInputType.phone,
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter your phone number',
+                                      ),
+                                        validator: (value) {
+                                         if (value == null || value.isEmpty) {
+                                          return 'Please enter your phone number.';
+                                        } else if (value.length>11 ||
+                                            value.length < 8) {
+                                          return 'Please enter a valid email address';
+                                        } 
+                                        //valdiate if all the same number
+                                        else if (value.runes.toSet().length == 1) {
+                                          return 'Please enter a valid phone number';
+                                        }
+                                        return null;
+                                      },
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          ListTile(
-                            title: const Text('Status'),
-                            subtitle: DropdownButton<String>(
-                              value: status,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  status = newValue;
-                                });
-                              },
-                              items: <String>[
-                                'Computer Programmer',
-                                'Student',
-                                'User',
-                                'Office Worker',
-                                'Housewife',
-                                'Others'
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
+                            ListTile(
+                              title: const Text('Status'),
+                              subtitle: DropdownButton<String>(
+                                value: status,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    status = newValue;
+                                  });
+                                },
+                                items: <String>[
+                                  'Computer Programmer',
+                                  'Student',
+                                  'User',
+                                  'Office Worker',
+                                  'Housewife',
+                                  'Others'
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                              ),
                             ),
-                          ),
-                          ListTile(
-                            title: const Text('Age'),
-                            subtitle: Slider(
-                              value: age.toDouble(),
-                              max: 100,
-                              divisions: 5,
-                              label: age.round().toString(),
-                              onChanged: (double value) {
-                                setState(() {
-                                  age = value.round();
-                                });
-                              },
+                            ListTile(
+                              title: const Text('Age'),
+                              subtitle: Slider(
+                                value: age.toDouble(),
+                                max: 100,
+                                divisions: 90,
+                                label: age.round().toString(),
+                                onChanged: (double value) {
+                                  setState(() {
+                                    age = value.round();
+                                  });
+                                },
+                              ),
                             ),
-                          ),
-                          CustomButton(
-                              onPressed: () {
-                                debugPrint('username: ${_usernameKey}');
-                                widget.bloc.add(ProfileModification(
-                                    username: usernameController.text,
-                                    email: emailController.text,
-                                    contact: contactController.text,
-                                    status: status!,
-                                    age: age,
-                                    profilePic: profilePic!));
-                              },
-                              buttonText: 'Save',
-                              isDisabled: false)
-                        ],
+                            CustomButton(
+                                onPressed: () {
+                                  if(isButtonEnabled){
+                                  if(_profileFormKey.currentState!.validate()){
+                                    setState(() {
+                                      isButtonEnabled = false;
+                                    });
+                                  widget.bloc.add(ProfileModification(
+                                      username: usernameController.text,
+                                      email: emailController.text,
+                                      contact: contactController.text,
+                                      status: status??"User",
+                                      age: age,
+                                      profilePic: profilePic??""));}else{
+                                    CustomSnackbar.showFailSnackbar(context, "Please fill in the form correctly");
+                                      }}
+                                },
+                                buttonText: 'Save',
+                                isDisabled: !isButtonEnabled)
+                          ],
+                        ),
                       ),
                     ),
                   );

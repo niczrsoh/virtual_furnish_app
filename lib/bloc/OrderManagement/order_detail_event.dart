@@ -12,3 +12,11 @@ class FetchOrderByType extends OrderDetailEvent {
 
   FetchOrderByType(this.type);
 }
+
+class ConfirmItem extends OrderDetailEvent {
+  final String orderID;
+
+  ConfirmItem(this.orderID);
+}
+
+

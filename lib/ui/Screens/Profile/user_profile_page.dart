@@ -128,7 +128,9 @@ class FoundWidget extends StatelessWidget {
               Navigator.pushNamed(context, '/order_detail', arguments: {"type":"process"});
             }),
         ListProfileTile(
-            title: "Shipping Address", subtitle: "3 address", onTap: () {}),
+            title: "Shipping Address", subtitle: "Manage your address here", onTap: () {
+              Navigator.pushNamed(context, '/delivery_address');
+            }),
         ListProfileTile(
             title: "Seller Registration", subtitle: (userModel.sell!=null&&userModel.sell!.isNotEmpty)?"1 shop":"0 shop", onTap: () async {
               var result = await Navigator.pushNamed(context, '/seller_register_list');
@@ -137,11 +139,22 @@ class FoundWidget extends StatelessWidget {
               }
             }),
         ListProfileTile(
-            title: "Payment method", subtitle: "Visa **34", onTap: () {}),
+            title: "Payment method", subtitle: "Visa **34", onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context){
+                return Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Payment Method'),
+                  ),
+                  body: const Center(child: Text('Using Stripe payment method in test mode \nUse 4242 4242 4242 4242 in payment field'),),
+                );
+              }));
+            }),
         ListProfileTile(
             title: "Account Setting",
             subtitle: "Notifications, password",
-            onTap: () {}),]
+            onTap: () {
+              Navigator.pushNamed(context, '/account_setting');
+            }),]
       ],
     ));
   }

@@ -64,13 +64,13 @@ class ItemDetailsPage extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                 case ItemDetailFetchedSuccess:
                 final currentState = state as ItemDetailFetchedSuccess;
-                return Row(
+                return ((!state.isGuest)?Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SecondaryCustomButton(
                         width: mq.width * 0.4,
                         onPressed: () {
-                          Navigator.pushNamed(context, '/chat_room', arguments: {"opponentID": currentState.itemData.sellerID});
+                          Navigator.pushNamed(context, '/chat_room', arguments: {"opponentID": currentState.itemData.sellerID, "from": "itemDetail"});
                         },
                         buttonText: 'Chat',
                         isDisabled: isButtonDisabled),
@@ -180,7 +180,7 @@ class ItemDetailsPage extends StatelessWidget {
                         buttonText: 'Buy Now',
                         isDisabled: isButtonDisabled),
                   ],
-                );
+                ):SizedBox());
                 default:
                     return const Center(
                         child: Text("Failed to load item details"));
@@ -241,6 +241,7 @@ class ItemDetailsPage extends StatelessWidget {
                                   Navigator.pushNamed(context, '/ar_space', arguments: {"itemId": currentState.itemData.id});
                                 },
                               )),
+                              if(!state.isGuest)
                               Flexible(
                                   child: IconButton(
                                 icon: Icon(Icons.add_shopping_cart_rounded),
@@ -320,6 +321,11 @@ class ItemDetailsPage extends StatelessWidget {
                                                                 .showSuccessSnackbar(
                                                                     context,
                                                                     "Successfully added to cart");
+                                                          }else if(state is CartProductFailedAdded){
+                                                            CustomSnackbar
+                                                                .showFailSnackbar(
+                                                                    context,
+                                                                    "Failed to add to cart");
                                                           }
                                                         },
                                                         child:
@@ -359,13 +365,14 @@ class ItemDetailsPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Flexible(
+                                flex: 7,
                                   child: Text(
                                 currentState.itemData.name ?? "no name",
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20),
                               )),
-                              Expanded(child: Container()),
                               Flexible(
+                                flex:3,
                                   child: Text(
                                       "RM ${currentState.itemData.price!.toStringAsFixed(2)}",
                                       style: TextStyle(
@@ -383,35 +390,7 @@ class ItemDetailsPage extends StatelessWidget {
                             height: 10,
                           ),
                           const Divider(),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Text('Payment method'),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              CustomButton(
-                                  width: mq.width * 0.4,
-                                  onPressed: () {},
-                                  buttonText: "Online Banking",
-                                  isDisabled: isButtonDisabled),
-                              CustomButton(
-                                  width: mq.width * 0.4,
-                                  onPressed: () {},
-                                  buttonText: "Touch n Go ewallet",
-                                  isDisabled: isButtonDisabled),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Divider(),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                         
                           const Text('Seller'),
                           const SizedBox(
                             height: 5,

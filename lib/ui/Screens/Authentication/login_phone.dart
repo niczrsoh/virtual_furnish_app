@@ -62,7 +62,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your phone number';
                         } else if (value.length < 9 || value.length > 10) {
-                          return 'Invalid phone number';
+                          return 'Phone number is invalid';
                         }
                         return null;
                       },

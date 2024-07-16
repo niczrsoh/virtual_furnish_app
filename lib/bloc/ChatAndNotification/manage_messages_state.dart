@@ -6,7 +6,7 @@ sealed class ManageMessagesState extends Equatable {
   @override
   List<Object> get props => [];
 }
-
+final class ChatRoomListFromGuest extends ManageMessagesState {}
 final class ManageMessagesInitial extends ManageMessagesState {}
 final class ManageChatRoomState extends ManageMessagesState {}
 final class ChatRoomFound extends ManageMessagesState {

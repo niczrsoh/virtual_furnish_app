@@ -104,6 +104,13 @@ class OrderRepo{
       return e.toString();
     }
   }
+  //get an order detail
+  static Future<MarketOrder> getOrderDetail(String id) async {
+    QuerySnapshot querySnapshot = await getSellerDocumentReference().collection(sellerCollectionName).where('id', isEqualTo: id).get();
+    MarketOrder model = MarketOrder.fromJson(querySnapshot.docs[0].data() as Map<String, dynamic>);
+    model.id = querySnapshot.docs[0].id;
+    return model;
+  }
   Future<MarketOrder> deleteOrder(int id) async {
     // delete order from api
      return MarketOrder();
@@ -124,5 +131,9 @@ class OrderRepo{
   static Future<int> getOrderNumbers() async {
     QuerySnapshot querySnapshot = await getUserDocumentReference().collection(userCollectionName).get();
     return querySnapshot.docs.length;
+  }
+  //confirm user item 
+  static Future<void> confirmUserItem(String orderID) async {
+    await getUserDocumentReference().collection(userCollectionName).doc(orderID).update({"status": "completed"});
   }
 }

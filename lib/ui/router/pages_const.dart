@@ -36,4 +36,8 @@ class PagePath {
   static const String pathARScreenShot = '/ar_screenshot';
   static const String pathARVideoImages = '/ar_video_images';
   static const String pathChatRoom = '/chat_room';
+  static const String path3DModelling = '/3d_modelling';
+  static const String pathFullScreen = '/full_screen';
+  static const String pathAccountSetting = '/account_setting';
+  static const String pathSelect3DTemplate = '/select_3d_template';
 }

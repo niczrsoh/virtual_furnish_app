@@ -47,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
             } else if (state is LoginFail) {
               print('login fail');
               CustomSnackbar.showFailSnackbar(context, state.message);
+                loginBloc.add(LoginPageEnableButton(isButtonEnabled: true));
             } else if (state is LoginLoading) {
               print('loading');
               CustomSnackbar.showLoadingSnackbar(context, 'loading');
@@ -76,6 +77,20 @@ class _LoginPageState extends State<LoginPage> {
                           hintText: 'Enter Email',
                           labelText: 'Email',
                         ),
+                        onEditingComplete: () {
+                          if (emailController.text.isEmpty) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter your email address.');
+                          }else if(!emailController.text.contains('@') || emailController.text.split('@').length>2) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter a valid email address.');
+                          }else if(emailController.text.startsWith('@')) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter a valid email address.');
+                          }else if(emailController.text.split('@').length<1) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter a valid email address.');
+                          }},
                       ),
                     ),
                     Container(
@@ -88,6 +103,25 @@ class _LoginPageState extends State<LoginPage> {
                           hintText: 'Enter Password',
                           labelText: 'Password',
                         ),
+                        onEditingComplete: () {
+                          if (passwordController.text.isEmpty) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Please enter your password.');
+                          }else if(passwordController.text.length<6) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Password	is	too short, try again.');
+                          }else if(!passwordController.text.contains(RegExp(r'[0-9]'))&& !passwordController.text.contains(RegExp(r'[a-z]|[A-Z]'))) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Password missing alphabet and number.');
+                          }
+                          else if(!passwordController.text.contains(RegExp(r'[0-9]'))) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Password missing number.');
+                                 //missing character
+                          }else if(!passwordController.text.contains(RegExp(r'[a-z]|[A-Z]'))) {
+                            CustomSnackbar.showFailSnackbar(
+                                context, 'Password missing alphabet.');
+                          }}
                       ),
                     ),
                     //forgot password at the left side
@@ -132,9 +166,8 @@ class _LoginPageState extends State<LoginPage> {
                                 await CustomSnackbar.showLoadingSnackbar(
                                     context, 'loading');
                                 //login with email and password
-                                loginBloc.add(FillLoginForm(
-                                    email: emailController.text.trim(),
-                                    password: passwordController.text.trim()));
+                                inputEmailAndPassword();
+                           
                               }
                             },
                             buttonText: 'Login',
@@ -215,5 +248,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void loginGoogle() {
     loginBloc.add(SelectGoogleAccount());
+  }
+  
+  void inputEmailAndPassword() {
+         loginBloc.add(FillLoginForm(
+                                    email: emailController.text.trim(),
+                                    password: passwordController.text.trim()));
   }
 }

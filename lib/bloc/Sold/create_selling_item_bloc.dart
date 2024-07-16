@@ -15,6 +15,7 @@ class CreateSellingItemBloc extends Bloc<CreateSellingItemEvent, CreateSellingIt
   }
 
   Future<FutureOr<void>> addProduct(AddProduct event, Emitter<CreateSellingItemState> emit) async {
+    emit(CreateSellingItemLoading());
     MarketplaceProductModel productModel = MarketplaceProductModel(
       name: event.name,
       category: event.category,

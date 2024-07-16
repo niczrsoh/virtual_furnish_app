@@ -8,6 +8,7 @@ class SellerAccountModel {
   String? shopName;
   String? type;
   String? userID;
+  String? profilePic;
   SellerAccountModel(
       {
         this.id,
@@ -18,7 +19,8 @@ class SellerAccountModel {
       this.location,
       this.shopName,
       this.type,
-      this.userID
+      this.userID,
+      this.profilePic
       });
   
   SellerAccountModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class SellerAccountModel {
     shopName = json['shopName'];
     type = json['type'];
     userID = json['userID'];
+    profilePic = json['profilePic'];
   }
   
   Map<String, dynamic> toJson() {
@@ -42,6 +45,7 @@ class SellerAccountModel {
     data['shopName'] = shopName;
     data['type'] = type;
     data['userID'] = userID;
+    data['profilePic'] = profilePic;
     return data;
   }
 }

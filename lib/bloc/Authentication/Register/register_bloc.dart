@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:virtual_furnish_app/core/helpers/auth_provider.dart';
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/user_repo.dart';
@@ -17,8 +18,10 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   }
 
   Future<FutureOr<void>> registerCreation(RegisterCreation event, Emitter<RegisterState> emit) async {
+    AuthenticationProvider().setRegistering(true);
+    bool isVerifiedEmail = false;
     final message = await AuthRepo.registerWithEmailandPassword(event.email, event.password);
-      if (message == "Register Success") {
+      if (message == "Email Registered Successfully") {
         UserModel userModel = UserModel(
           id: FirebaseAuth.instance.currentUser!.uid,
           username: event.name,
@@ -30,6 +33,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
           contact: "",
           status: "User",
         );
+        AuthenticationProvider().setRegistering(false);
         final value = await UserRepo.saveUser(userModel);
         if (value == "User Added") {
           emit(RegisterSuccess(message: message));

@@ -122,7 +122,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
       required String currency,
       required double total}) async {
       Map<String, dynamic> body = {
-        'amount': total.toInt().toString(),
+        'amount': (total.toInt() * 100).toString(),
         'currency': 'usd',
       };
     final url = Uri.parse(

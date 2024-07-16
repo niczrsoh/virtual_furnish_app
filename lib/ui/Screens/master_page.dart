@@ -48,7 +48,6 @@ List<BottomNavigationBarItem> sellerBottomNavBars =
 int tabIndex = 0;
 UserProfileBloc userProfileBloc = UserProfileBloc()..add(UserProfileFetched());
 SellerProfileBloc sellerProfileBloc = SellerProfileBloc();
-CartBloc cartBloc = CartBloc()..add(LoadCart());
 CreateSellingItemBloc createSellingItemBloc = CreateSellingItemBloc();
 SellingOrderBloc sellingOrderBloc = SellingOrderBloc()..add(FetchItems());
 SoldListBloc soldListBloc = SoldListBloc()..add(SoldListDataFetched());
@@ -61,15 +60,19 @@ List<Widget> bottomNavScreen = [
     child: MarketplacePage(marketplaceBloc: marketplaceBloc),
   ),
   BlocProvider<CartBloc>.value(
-    value: cartBloc,
-    child: CartProductPage(cartBloc: cartBloc),
+    value: AppRouter.cartBloc..add(LoadCart()),
+    child: CartProductPage(cartBloc: AppRouter.cartBloc),
   ),
   //RemoteObject(),
-  ARVideoImagesPage(bloc: arMediabloc),
+  BlocProvider<ArMediaBloc>.value(
+    value: arMediabloc,
+    child: ARVideoImagesPage(bloc: arMediabloc),
+  ),
   //ARSpacePage(),
   BlocProvider<ManageMessagesBloc>.value(
     value: AppRouter.manageMessagesBloc..add(FetchChatRoomListEvent()),
-    child: ChatListPage(bloc: AppRouter.manageMessagesBloc),),
+    child: ChatListPage(bloc: AppRouter.manageMessagesBloc),
+  ),
   BlocProvider<UserProfileBloc>.value(
     value: userProfileBloc,
     child: UserProfilePage(userProfileBloc: userProfileBloc),
@@ -93,9 +96,10 @@ List<Widget> sellerBottomNavScreen = [
   ),
   BlocProvider<ManageMessagesBloc>.value(
     value: AppRouter.manageMessagesBloc..add(FetchChatRoomListEvent()),
-    child: ChatListPage(bloc: AppRouter.manageMessagesBloc),),
+    child: ChatListPage(bloc: AppRouter.manageMessagesBloc),
+  ),
   BlocProvider<SellerProfileBloc>.value(
-    value: sellerProfileBloc,
+    value: sellerProfileBloc..add(SellerProfileSearch()),
     child: SellerProfilePage(sellerProfileBloc: sellerProfileBloc),
   )
 ];
@@ -115,40 +119,70 @@ class _MasterPageState extends State<MasterPage> {
     getSeller();
     super.initState();
   }
+
   void getSeller() async {
-     userType= await SellerRepo.isSeller(AuthRepo.getCurrentUserId()!);
-     if(userType != null && userType.isNotEmpty){
-       setState(() {
-          userType = userType;
-          foundUserType = true;
-       });
-     }
+    bool isGuest = AuthRepo.isGuest();
+    if(isGuest){
+    setState(() {
+      userType = "user";
+      foundUserType = true;
+    });
+    }else{
+    userType = await SellerRepo.isSeller(AuthRepo.getCurrentUserId()!);
+    if (userType != null && userType.isNotEmpty) {
+      setState(() {
+        userType = userType;
+        foundUserType = true;
+      });
+    }}
   }
+
   @override
   Widget build(BuildContext context) {
-         return  (foundUserType)?  Scaffold(
-              body: Center(
-                  child: userType == "seller"
-                      ? sellerBottomNavScreen.elementAt(tabIndex)
-                      : bottomNavScreen.elementAt(tabIndex)),
-              bottomNavigationBar: BottomNavigationBar(
-                items: userType == "seller"
-                    ? sellerBottomNavBars
-                    : bottomNavBars,
-                selectedItemColor: Colors.teal,
-                unselectedItemColor: Colors.grey,
-                currentIndex: tabIndex,
-                onTap: (index) {
-                  if(userType == "seller"){
-                    if(index == 0){
-                      soldListBloc.add(SoldListDataFetched());
-                    }
+    return (foundUserType)
+        ? Scaffold(
+            body: Center(
+                child: userType == "seller"
+                    ? sellerBottomNavScreen.elementAt(tabIndex)
+                    : bottomNavScreen.elementAt(tabIndex)),
+            bottomNavigationBar: BottomNavigationBar(
+              items: userType == "seller" ? sellerBottomNavBars : bottomNavBars,
+              selectedItemColor: Colors.teal,
+              unselectedItemColor: Colors.grey,
+              currentIndex: tabIndex,
+              onTap: (index) {
+                print("index: $index");
+                if (userType == "seller") {
+                  if (index == 0) {
+                    soldListBloc.add(SoldListDataFetched());
+                  } else if (index == 1) {
+                    sellingOrderBloc.add(FetchItems());
+                  } else if (index == 4){
+                    sellerProfileBloc.add(SellerProfileSearch());
                   }
-                  setState(() {
-                    tabIndex = index;
-                  });
-                },
-              ),
-            ): Center(child: RunningDotsLoader());
-}
+                }
+                if (userType == "user") {
+                  if (index == 0) {
+                    marketplaceBloc.add(FetchMostSellingItems());
+                  } else if (index == 1) {
+                    AppRouter.cartBloc.add(LoadCart());
+                  } else if (index == 2) {
+                    arMediabloc.add(ArMediaLoad());
+                  } else if (index == 3) {
+                    AppRouter.manageMessagesBloc.add(FetchChatRoomListEvent());
+                  } else if (index == 4) {
+                    userProfileBloc.add(UserProfileFetched());
+                  }
+                }
+                if (index == 3) {
+                  AppRouter.manageMessagesBloc.add(FetchChatRoomListEvent());
+                }
+                setState(() {
+                  tabIndex = index;
+                });
+              },
+            ),
+          )
+        : Center(child: RunningDotsLoader());
   }
+}

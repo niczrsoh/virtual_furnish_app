@@ -11,8 +11,7 @@
 // }
 
 // class _ARSpacePageState extends State<ARSpacePage> {
-//   static final GlobalKey<ScaffoldState> _scaffoldKey =
-//       GlobalKey<ScaffoldState>();
+//   static final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 //   UnityWidgetController? _unityWidgetController;
 //   double _sliderValue = 0.0;
 

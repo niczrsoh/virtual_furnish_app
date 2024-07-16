@@ -13,6 +13,7 @@ part 'order_detail_state.dart';
 class OrderDetailBloc extends Bloc<OrderDetailEvent, OrderDetailState> {
   OrderDetailBloc() : super(OrderDetailInitial()) {
     on<FetchOrderByType>(fetchEventByType);
+    on<ConfirmItem>(confirmItem);
   }
 
   Future<FutureOr<void>> fetchEventByType(FetchOrderByType event, Emitter<OrderDetailState> emit) async {
@@ -34,4 +35,16 @@ class OrderDetailBloc extends Bloc<OrderDetailEvent, OrderDetailState> {
       emit(OrderDetailError(e.toString()));
   }
 }
+
+  FutureOr<void> confirmItem(ConfirmItem event, Emitter<OrderDetailState> emit) {
+    emit(OrderDetailLoading());
+    try {
+      OrderRepo.confirmUserItem(event.orderID);
+      
+      emit(OrderDetailConfirmed());
+      add(FetchOrderByType('received'));
+    } catch (e) {
+      emit(OrderDetailError(e.toString()));
+    }
+  }
 }

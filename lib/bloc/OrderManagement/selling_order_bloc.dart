@@ -41,8 +41,8 @@ class SellingOrderBloc extends Bloc<SellingOrderEvent, SellingOrderState> {
        try {
       String type = (event.type.contains('Transaction No')) ? "transactionNumber" : event.type;
       String result = await OrderRepo.updateOrder(event.id,type,event.value, event.customerID);
+     
       if(result == event.value){
-        FetchItems();
         emit(UpdateOrderItemSuccess(value: result, type: event.type, index: event.index));
       }
       else{

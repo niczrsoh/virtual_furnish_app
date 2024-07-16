@@ -9,6 +9,7 @@ import 'package:virtual_furnish_app/ui/Widgets/custom_button.dart';
 
 class CartProductPage extends StatelessWidget {
   CartBloc cartBloc;
+  bool isGuest = false;
   CartProductPage({super.key, required this.cartBloc});
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,7 @@ class CartProductPage extends StatelessWidget {
           automaticallyImplyLeading: false,
           title: Text('Cart Product Page'),
         ),
-        bottomSheet: Container(
+        bottomSheet: (isGuest==false)?Container(
             decoration: BoxDecoration(
               boxShadow: const [
                 BoxShadow(
@@ -29,7 +30,6 @@ class CartProductPage extends StatelessWidget {
                     offset: Offset(0, 4),
                     blurRadius: 5.0)
               ],
-              borderRadius: BorderRadius.circular(12),
               color: CustomColor.primaryBackgroundColor,
             ),
             padding: PaddingStyles.paddingStyle1,
@@ -65,7 +65,7 @@ class CartProductPage extends StatelessWidget {
                         bloc: cartBloc,
                         builder: (context, state) {
                           return Text(
-                          (state.totalPrice!=null)?"RM ${state.totalPrice!.toStringAsFixed(2)}":"",
+                          (state.totalPrice!=null)?"RM ${state.totalPrice!.toStringAsFixed(2)}":"RM 0.00",
                             style: TextStyle(
                                 color: CustomColor.priceTagColor,
                                 fontWeight: FontWeight.bold),
@@ -104,13 +104,22 @@ class CartProductPage extends StatelessWidget {
                   },
                 ),
               ],
-            )),
+            )):null,
         body: BlocConsumer<CartBloc, CartState>(
           listener: (context, state) {
             // TODO: implement listener
           },
           builder: (context, state) {
             switch (state.runtimeType) {
+              case CartProductPageEmpty:
+                return Center(
+                  child: Text('No Product in Cart'),
+                );
+              case CartProductPageFromGuest:
+              isGuest = true;
+                return Center(
+                  child: Text("Please login to view cart products"),
+                );
               case CartListFetchedSuccess ||
                     CartProductUpdated || 
                     CartProductSelected ||

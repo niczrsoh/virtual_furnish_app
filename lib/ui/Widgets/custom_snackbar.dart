@@ -3,6 +3,19 @@ import 'package:flutter/widgets.dart';
 import 'package:virtual_furnish_app/ui/Styles/color_styles.dart';
 
 class CustomSnackbar {
+  static Future<void> showNormalSnackbar(BuildContext context, String? message) async {
+    await ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: 
+            Row(
+              children: [
+                Flexible(child: Text(message??"Tapped !")),
+              ],
+            ),
+      ),
+    ).closed;
+  }
+
   static Future<void> showLoadingSnackbar(BuildContext context, String? message) async {
     await ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

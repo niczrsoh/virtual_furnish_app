@@ -90,11 +90,11 @@ class FoundWidget extends StatelessWidget {
           ),
         ),
         ListProfileTile(
-            title: sellerModel.shopName??"", leading: "Shop Image", onTap: () {}),
+            title: sellerModel.shopName??"", leading: "Shop Seller", onTap: () {}),
         ListProfileTile(
-            title: sellerModel.email??"", leading: "email Image", onTap: () {}),
+            title: sellerModel.email??"", leading: "Email Seller", onTap: () {}),
         ListProfileTile(
-            title: sellerModel.location??"", leading: "location Image", onTap: () {
+            title: sellerModel.location??"", leading: "location Seller", onTap: () {
             }),
       ],
     ));

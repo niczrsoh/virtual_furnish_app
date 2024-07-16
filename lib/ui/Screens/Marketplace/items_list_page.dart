@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Marketplace/item_list_bloc.dart';
 import 'package:virtual_furnish_app/enums/item_category.dart';
@@ -129,21 +130,23 @@ class ItemsListPage extends StatelessWidget {
                                       SizedBox(
                                         height: 10,
                                       ),
-                                      Text(
-                                        successState.itemData[index].name ?? '',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
+                                      Flexible(
+                                        child: Text(
+                                          successState.itemData[index].name ?? '',
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15),
+                                        ),
                                       ),
                                       SizedBox(
                                         height: 10,
                                       ),
                                       Text(
-                                          "RM: ${successState.itemData[index].price}",
+                                          "RM ${successState.itemData[index].price!.toStringAsFixed(2)}",
                                           textAlign: TextAlign.left,
                                           style: TextStyle(
-                                              fontWeight: FontWeight.bold)),
+                                              fontWeight: FontWeight.bold,  fontSize: 12)),
                                     ],
                                   ),
                                 )),

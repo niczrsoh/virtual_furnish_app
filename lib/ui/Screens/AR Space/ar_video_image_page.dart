@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:virtual_furnish_app/bloc/ARSpace/ar_media_bloc.dart';
 import 'package:virtual_furnish_app/main.dart';
+import 'package:virtual_furnish_app/ui/Screens/Common/full_screen_page.dart';
 import 'package:virtual_furnish_app/ui/Styles/export_styles.dart';
 
 class ARVideoImagesPage extends StatelessWidget {
@@ -28,8 +29,11 @@ class ARVideoImagesPage extends StatelessWidget {
             buildWhen: (previous, current) => current is! ArMediaActionState,
             builder: (context, state) {
               switch (state.runtimeType) {
+                case ArMediaFromGuest:
+                  return const Center(
+                    child: Text("Please login to save your AR media!"),
+                  );
                 case ArMediaInitial:
-                  bloc.add(ArMediaLoad());
                   return const Center(child: CircularProgressIndicator());
                 case ArMediaLoaded:
                   final currentState = state as ArMediaLoaded;
@@ -60,6 +64,19 @@ class ARVideoImagesPage extends StatelessWidget {
                               : const Text(""),
                           onTap: () {
                             //logic for playing the video or displaying the image
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CustomFullScreen(
+                                  image: NetworkImage(
+                                      currentState.arMediaList[index].image!),
+                                  tag: currentState.arMediaList[index].image!,
+                                  height: mq.height * 0.6,
+                                  width: mq.width * 0.6,
+                                  revert: true,
+                                ),
+                              ),
+                            );
                           },
                         ),
                       );

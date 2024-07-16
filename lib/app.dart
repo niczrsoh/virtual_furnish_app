@@ -22,6 +22,7 @@ class App extends StatelessWidget {
     ]);
     mq = MediaQuery.of(context).size;
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
     //  home: ARFlutterPage(),
       navigatorObservers: [routeObserver],
       title: 'Virtual Furnish',

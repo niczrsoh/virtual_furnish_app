@@ -33,6 +33,12 @@ class ArControllerBloc extends Bloc<ArControllerEvent, ArControllerState> {
       String itemID = event.itemId;
       MarketplaceProductModel model = await MarketplaceRepo.getSellingItem(itemID);
       String url = model.threeDimensionModel!;
+      String? fileType;
+      if (url.contains('.glb')) {
+        fileType = 'glb';
+      } else if (url.contains('.gltf')) {
+        fileType = 'gltf';
+      }
       String filename = model.name!;
       HttpClient httpClient = HttpClient();
       var request = await httpClient.getUrl(Uri.parse(url));
@@ -49,7 +55,8 @@ class ArControllerBloc extends Bloc<ArControllerEvent, ArControllerState> {
       debugPrint("writing to file: ${file.path}");
       await file.writeAsBytes(bytes);
       debugPrint("Downloading finished, path: " + '$dir/$filename');
-      emit(ArControllerSuccessDownloadModel(itemID: itemID, filename: filename, category: model.category!));
+      if(fileType == null) throw Exception('File type not supported');
+      emit(ArControllerSuccessDownloadModel(itemID: itemID, filename: filename, category: model.category!, fileType: fileType!));
     } catch (e) {
       debugPrint('Error downloading file: $e');
       // Handle the error appropriately, e.g., show an error message, retry, etc.
@@ -58,6 +65,7 @@ class ArControllerBloc extends Bloc<ArControllerEvent, ArControllerState> {
 
   FutureOr<void> arControllerLoadSubsequentModels(ArControllerLoadSubsequentModels event, Emitter<ArControllerState> emit) async {
    try {
+      emit(ArControllerLoadingSubsequentModels());
       String itemID = event.itemId;
       MarketplaceProductModel model = await MarketplaceRepo.getSellingItem(itemID);
       String url = model.threeDimensionModel!;

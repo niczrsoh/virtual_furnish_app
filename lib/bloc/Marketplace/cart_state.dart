@@ -27,14 +27,20 @@ final class CartError extends CartState {
   CartError(this.message);
 
 }
-
+final class CartProductPageFromGuest extends CartState {
+  CartProductPageFromGuest();
+}
 final class CartProductAdded extends CartState {}
+final class CartProductFailedAdded extends CartState {}
 final class CartProductRemoved extends CartState {
   final List<CartProductModel> cartProducts;
   final List<MarketplaceProductModel> products;
   final double totalPrice;
   final List<CartProductModel> selectedCartProducts;
   CartProductRemoved(this.selectedCartProducts,this.cartProducts, this.products, this.totalPrice):super(selectedCartProducts: selectedCartProducts,cartProducts: cartProducts, products: products, totalPrice: totalPrice);
+}
+final class CartProductPageEmpty extends CartState {
+  CartProductPageEmpty();
 }
 final class CartProductUpdated extends CartState {
     final List<CartProductModel> cartProducts;

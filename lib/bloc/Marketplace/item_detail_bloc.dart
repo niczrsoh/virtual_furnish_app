@@ -8,6 +8,7 @@ import 'package:virtual_furnish_app/data/model/Authentication/sell_account_model
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/model/MarketplaceProduct/cart_product_model.dart';
 import 'package:virtual_furnish_app/data/model/MarketplaceProduct/product_model.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/user_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Marketplace/cart_product_repo.dart';
@@ -34,9 +35,10 @@ class ItemDetailBloc extends Bloc<ItemDetailEvent, ItemDetailState> {
           SellerAccountModel sellerData =
               await SellerRepo.getSellerInfo(itemData.sellerID!);
           UserModel? user = await UserRepo.getUser(sellerData.userID!);
+          bool isGuest = AuthRepo.isGuest();
           if (sellerData != null && user != null) {
                emit(ItemDetailFetchedSuccess(
-                itemData: itemData, sellerData: sellerData, userData: user));
+                itemData: itemData, sellerData: sellerData, userData: user, isGuest: isGuest));
           }
         } else {
           emit(ItemDetailFetctedFail());

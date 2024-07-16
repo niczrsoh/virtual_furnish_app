@@ -32,23 +32,27 @@ import 'package:virtual_furnish_app/ui/Screens/Authentication/login_phone.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/otp_verification_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Authentication/register_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/ChatAndNotification/chat_room_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Common/full_screen_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Common/three_dimension_object_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Common/video_player_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Home/home_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Marketplace/address_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/cart_product_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/checkout_page.dart';
-import 'package:virtual_furnish_app/ui/Screens/Marketplace/delivery_addresses_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/item_detail_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/items_list_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/marketplace_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Marketplace/payment_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/OrderManagement/order_detail_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/OrderManagement/selling_order_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Profile/edit_account_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/edit_profile_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/seller_register_list.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/seller_registration_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Profile/user_profile_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Sold/3d_modelling_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/Sold/create_selling_item_page.dart';
+import 'package:virtual_furnish_app/ui/Screens/Sold/select_3d_template_page.dart';
 import 'package:virtual_furnish_app/ui/Screens/master_page.dart';
 import 'package:virtual_furnish_app/ui/router/pages_const.dart';
 import 'package:virtual_furnish_app/ui/Screens/root_page.dart';
@@ -86,6 +90,10 @@ class AppRouter {
                   ],
                   child: const RootPage(),
                 ));
+      case PagePath.pathAccountSetting:
+        return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => Resetpage());
       case PagePath.pathHome:
         return MaterialPageRoute(
           settings: settings,
@@ -134,6 +142,10 @@ class AppRouter {
                   value: sellerRegister..add(SellerRegisterFetchList()),
                   child: SellerRegisterList(sellerRegisterBloc: sellerRegister),
                 ));
+      case PagePath.pathSelect3DTemplate:
+        return MaterialPageRoute(
+            settings: settings,
+            builder: (context) => Select3DTemplatePage());
       case PagePath.pathSellerRegister:
         return MaterialPageRoute(
             settings: settings,
@@ -240,7 +252,10 @@ class AppRouter {
       case PagePath.pathDeliveryAddress:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => const DeliveryAddressesPage(),
+          builder: (_) => BlocProvider<CheckoutBloc>.value(
+            value: checkoutBloc..add(LoadAddress()),
+            child: AddressPage(checkoutBloc: checkoutBloc),
+          ),
         );
       case PagePath.pathCheckout:
         return MaterialPageRoute(
@@ -287,6 +302,12 @@ class AppRouter {
             child: ARVideoImagesPage(bloc: arMediaBloc),
           ),
         );
+      case PagePath.path3DModelling:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ThreeDimensionModellingPage(),
+        );
+    
       default:
         return MaterialPageRoute(
           settings: settings,

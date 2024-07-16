@@ -38,7 +38,17 @@ class UserRepo{
       return e.toString();
     }
   }
-
+  //get user profile picture
+  static Future<String> getUserProfilePic(String id) async {
+    try{
+      DocumentSnapshot documentSnapshot = await _userCollection.doc(id).get();
+      UserModel userModel = UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      return userModel.profilePic!;
+    }
+    catch(e){
+      return e.toString();
+    }
+  }
   //get user using the user id
   static Future<UserModel> getUser(String id) async {
     try{
@@ -56,7 +66,7 @@ class UserRepo{
   //edit user profile
   static Future<String> editUser(UserModel userModel) async {
     try{
-      if(userModel.profilePic!=null && !userModel.profilePic!.contains("https:/")){
+      if(userModel.profilePic!=null && userModel.profilePic!="" && !userModel.profilePic!.contains("https:/")){
       String url = await FirebaseStorageRepo.uploadFile(path: userModel.profilePic!, category: "Profile");
       userModel.profilePic = url;}
       String uid = AuthRepo.getCurrentUserId()!;

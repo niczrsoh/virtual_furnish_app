@@ -1,4 +1,6 @@
 //make a custom full screen image widget class
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:virtual_furnish_app/ui/Styles/color_styles.dart';
 
@@ -9,8 +11,9 @@ class CustomFullScreen extends StatelessWidget {
   final double? height;
   final double? width;
   final Color? colorArrowBack;
+  final bool? revert;
   const CustomFullScreen(
-      {Key? key,this.videoUrl, this.image, this.tag, this.height, this.width,this.colorArrowBack})
+      {Key? key,this.videoUrl, this.image, this.tag, this.height, this.width,this.colorArrowBack, this.revert})
       : super(key: key);
 
   @override
@@ -28,15 +31,21 @@ class CustomFullScreen extends StatelessWidget {
             Navigator.pop(context);
           },
           child: Center(
-            child: Hero(
-              tag: tag??"1",
-              child: Container(
-                height: height,
-                width: width,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: image!,
-                    fit: BoxFit.fill,
+            child: Transform.rotate(
+               angle: revert!=null?(revert==true)?-90 * pi / 180:0:0,
+              child: Hero(
+                tag: tag??"1",
+                child: Transform.rotate(
+                  angle: revert!=null?(revert==true)?90 * pi / 180:0:0,
+                  child: Container(
+                    height: height,
+                    width: width,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: image!,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
                   ),
                 ),
               ),

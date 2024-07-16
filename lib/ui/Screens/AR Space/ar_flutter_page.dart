@@ -84,10 +84,6 @@ class _ARFlutterPageState extends State<ARFlutterPage> {
   }
 Future<File> _downloadFile(String url, String filename) async {
   try {
-    // HttpClient.enableTimelineLogging = true;
-    // SecurityContext securityContext = SecurityContext()
-    //   ..setTrustedCertificatesBytes([]);
-    // HttpClient httpClient = HttpClient(context: securityContext);
         HttpClient httpClient = HttpClient();
     var request = await httpClient.getUrl(Uri.parse(url));
     var response = await request.close();

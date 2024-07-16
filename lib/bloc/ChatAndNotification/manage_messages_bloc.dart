@@ -8,6 +8,7 @@ import 'package:virtual_furnish_app/data/model/Authentication/sell_account_model
 import 'package:virtual_furnish_app/data/model/Authentication/user_model.dart';
 import 'package:virtual_furnish_app/data/model/ChatAndNotification/chat_model.dart';
 import 'package:virtual_furnish_app/data/model/ChatAndNotification/message_%20model.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/user_repo.dart';
 import 'package:virtual_furnish_app/data/repo/ChatAndNotification/chat_repo.dart';
@@ -85,6 +86,10 @@ class ManageMessagesBloc
   FutureOr<void> fetchChatRoomListEvent(
       FetchChatRoomListEvent event, Emitter<ManageMessagesState> emit) async {
     emit(ChatRoomListFetching());
+    if(AuthRepo.isGuest()){
+      emit(ChatRoomListFromGuest());
+      return;
+    }
     String userType = await UserRepo.getCurrentUserType();
     List<ChatModel> model = await ChatRepo.getChatRoomList( userType);
     
@@ -93,6 +98,9 @@ class ManageMessagesBloc
       for (int i = 0; i < model.length; i++) {
         SellerAccountModel seller =
             await SellerRepo.getSellerInfo(model[i].opponentID!);
+        //get seller profile picture
+        String profilePicture = await UserRepo.getUserProfilePic(seller.userID!);
+        seller.profilePic = profilePicture;
         sellerList.add(seller);
       }
       if (sellerList.isNotEmpty)

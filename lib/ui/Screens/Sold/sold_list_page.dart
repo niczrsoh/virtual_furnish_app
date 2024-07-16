@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:virtual_furnish_app/bloc/OrderManagement/selling_order_bloc.dart';
 import 'package:virtual_furnish_app/bloc/Sold/sold_list_bloc.dart';
 import 'package:virtual_furnish_app/main.dart';
 import 'package:virtual_furnish_app/ui/Screens/master_page.dart';
@@ -55,9 +56,9 @@ class SoldListPage extends StatelessWidget {
           ),
           body: BlocConsumer<SoldListBloc, SoldListState>(
             //build when is not action state
-         //   buildWhen: (previous, current) => current is! SoldListActionState && current is! SoldListConditionState,
+            buildWhen: (previous, current) => current is! SoldListActionState && current is! SoldListConditionState,
             //listener when is action state
-         //   listenWhen: (previous, current) => current is SoldListActionState,
+            listenWhen: (previous, current) => current is SoldListActionState,
             bloc: soldListBloc,
             listener: (context, state) {
               if (state is DeleteItemSuccess) {
@@ -148,6 +149,7 @@ class EntryItem extends StatelessWidget {
   final SoldListBloc soldListBloc;
   final String id;
   final int index;
+
   Widget _buildTiles(Entry root) {
     if (root.children.isEmpty) return ListTile(title: Text(root.title));
     return ExpansionTile(
@@ -187,6 +189,8 @@ class EntryItem extends StatelessWidget {
         debugPrint('image: ${root.children[i].title}');
       }
     }
+    String type = root.title.split(':').first;
+    String value = root.title.split(':').last.trim();
     return (root.title == "images")
         ? CarouselSlider.builder(
             key: PageStorageKey('myScrollable'),
@@ -226,9 +230,14 @@ class EntryItem extends StatelessWidget {
                 isDisabled: false)
             : GestureDetector(
                 onTap: () {},
-                child: BlocBuilder<SoldListBloc, SoldListState>(
+                child: BlocConsumer<SoldListBloc, SoldListState>(
                   bloc: soldListBloc,
-                  buildWhen: (previous, current) => current is RequestEditSuccess || current is UpdateItemSuccess || current is SoldListDataFetchedByNameSuccess,
+                  buildWhen: (previous, current) => current is RequestEditSuccess || current is UpdateItemSuccess,
+                  listener: (current, state) {
+                     if(state is UpdateItemSuccess && root.title.split(":").first == state.type && index == state.index){
+                      value = state.value;
+                      }
+                  },
                   builder: (context, state) {
                     return ListTile(
                         trailing: IconButton(
@@ -254,7 +263,8 @@ class EntryItem extends StatelessWidget {
                                       index: state.index,
                                       value: value));
                                 },
-                            ): Text(((state is UpdateItemSuccess && root.title.split(":").first == state.type && index == state.index)?"${state.type}: ${state.value}":root.title)));
+                                
+                            ): Text("${type}: ${value}"));
                   },
                 ));
   }
@@ -266,7 +276,7 @@ class EntryItem extends StatelessWidget {
 }
 
 class Entry {
-  const Entry(this.title, [this.children = const <Entry>[]]);
-  final String title;
+   Entry(this.title, [this.children = const <Entry>[]]);
+  String title;
   final List<Entry> children;
 }

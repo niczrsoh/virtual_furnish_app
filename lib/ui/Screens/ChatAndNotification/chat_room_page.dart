@@ -9,6 +9,7 @@ import 'package:virtual_furnish_app/bloc/ChatAndNotification/manage_messages_blo
 import 'package:virtual_furnish_app/data/model/ChatAndNotification/message_%20model.dart';
 import 'package:virtual_furnish_app/main.dart';
 import 'package:virtual_furnish_app/ui/Styles/export_styles.dart';
+import 'package:virtual_furnish_app/ui/Widgets/custom_snackbar.dart';
 
 class ChatRoomPage extends StatefulWidget {
   ChatRoomPage({super.key, required this.bloc});
@@ -101,20 +102,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         state is MessageSent ||
                                         state is MessageNotSent,
                                     builder: (context, state) {
-                                      return Row(
-                                        children: [
-                                          Flexible(
-                                              child: Text(
+                                      return Column(
+                                        children: [Text(
                                                   messages[index].textMessage ??
-                                                      "")),
-                                          Expanded(child: SizedBox()),
+                                                      ""),
                                           //two small icons for read and unread
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
                                           messages[index].checked == null
-                                              ? Icon(Icons.av_timer)
+                                              ? Icon(Icons.av_timer )
                                               : (messages[index].checked!)
                                                   ? Icon(Icons.check, size: 10)
                                                   : Icon(Icons.check_circle,
-                                                      size: 10),
+                                                      size: 10),])
                                         ],
                                       );
                                     }),
@@ -142,6 +143,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           IconButton(
                             icon: Icon(Icons.send),
                             onPressed: () {
+                              if(messageController.text.isEmpty){
+                                CustomSnackbar.showFailSnackbar(context, "Please enter any message before sending.");
+                                return;
+                              }
                               //randomly generate message id
                               String messageID = messages.length.toString() +
                                   Random().nextInt(100).toString();
@@ -165,6 +170,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   message: messageController.text,
                                 ),
                               );
+                               //clear the text field
+                              messageController.clear();
                             },
                           )
                         ],

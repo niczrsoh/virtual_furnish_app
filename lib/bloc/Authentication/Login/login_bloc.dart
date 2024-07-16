@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 import 'package:virtual_furnish_app/data/repo/Authentication/seller_repo.dart';
+import 'package:bloc_test/bloc_test.dart';
 part 'login_event.dart';
 part 'login_state.dart';
 
@@ -19,13 +20,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   FutureOr<void> fillLoginForm(FillLoginForm event, Emitter<LoginState> emit) async {
     if (event.email.isNotEmpty && event.password.isNotEmpty) {
       String message = await AuthRepo.loginWithEmailandPassword(event.email, event.password);
-       String userType= await SellerRepo.isSeller(AuthRepo.getCurrentUserId()!);
+      
       if(message == "Login Success"){
-      emit(LoginSuccess(message: message, userType: userType));}
+        String userType= await SellerRepo.isSeller(AuthRepo.getCurrentUserId()!);
+        LoginPageEnableButton(isButtonEnabled: true);
+        emit(LoginSuccess(message: message, userType: userType));
+      }
       else{
-        emit(LoginFail(message: message));
+        LoginPageEnableButton(isButtonEnabled: true);
+        emit(LoginFail(message: message.split(']').last));
       } 
     } else {
+      LoginPageEnableButton(isButtonEnabled: true);
       emit(LoginFail(message: "Login  Failed"));
     }
   }

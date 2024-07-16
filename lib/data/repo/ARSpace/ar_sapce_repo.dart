@@ -66,11 +66,22 @@ class ArSpaceRepo{
         "BABY_FURNITURE" : "DRAWER",
       };
       //get the suggested pair product
-      QuerySnapshot querySnapshot = await _marketplaceCollection.where("category", isEqualTo: categoryMap[category]).get();
-      querySnapshot.docs.forEach((element) {
+      QuerySnapshot suggestedQuerySnapshot = await _marketplaceCollection.where("category", isEqualTo: categoryMap[category]).get();
+      QuerySnapshot sameQuerySnapshot = await _marketplaceCollection.where("category", isEqualTo: category).get();
+      suggestedQuerySnapshot.docs.forEach((element) {
         MarketplaceProductModel model = MarketplaceProductModel.fromJson(element.data() as Map<String, dynamic>);
         model.id = element.id;
-        arMediaList.add(model);
+        //only if have 3d model
+        if(model.threeDimensionModel != null && model.threeDimensionModel != ""){
+          arMediaList.add(model);
+        }
+      });
+      sameQuerySnapshot.docs.forEach((element) {
+        MarketplaceProductModel model = MarketplaceProductModel.fromJson(element.data() as Map<String, dynamic>);
+        model.id = element.id;
+        if(model.threeDimensionModel != null && model.threeDimensionModel != ""){
+          arMediaList.add(model);
+        }
       });
       return arMediaList;
     }

@@ -36,8 +36,8 @@ class _RootPageState extends State<RootPage> {
               child: CircularProgressIndicator(),
             );
           }
-          if (snapshot.hasData) {
-            return  MasterPage();
+          if (snapshot.hasData && !(context.watch<AuthenticationProvider>().isRegistering)) {
+            return MasterPage();
           }else{
             return LoginPage();
           }

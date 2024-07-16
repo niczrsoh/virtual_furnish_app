@@ -71,16 +71,12 @@ class SoldListBloc extends Bloc<SoldListEvent, SoldListState> {
       String result = await MarketplaceRepo.editMarketplaceProduct(event.id,event.type,event.value);
       if(result == event.value){
         emit(UpdateItemSuccess(value: result, type: event.type, index: event.index));
-   //     add(RequestEdit(isEdit: false, type: event.type));
-        //add(SoldListDataFetched());
       }
       else{
         emit(UpdateItemFail());
-       //  add(SoldListDataFetched());
       }
     } catch (e) {
       emit(UpdateItemFail());
- //      add(SoldListDataFetched());
     }
   }
 

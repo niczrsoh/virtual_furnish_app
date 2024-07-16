@@ -9,7 +9,7 @@ sealed class ArMediaState extends Equatable {
 
 final class ArMediaInitial extends ArMediaState {}
 final class ArMediaActionState extends ArMediaState {}
-
+final class ArMediaFromGuest extends ArMediaState {}
 final class ArMediaLoaded extends ArMediaState {
   final List<ARMediaStorageModel> arMediaList;
   ArMediaLoaded(this.arMediaList);

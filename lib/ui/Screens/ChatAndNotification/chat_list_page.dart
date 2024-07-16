@@ -19,6 +19,10 @@ class ChatListPage extends StatelessWidget {
         buildWhen: (previous, current) => current is ManageChatRoomState,
         builder: (context, state) {
           switch (state.runtimeType) {
+            case ChatRoomListFromGuest:
+              return Center(
+                child: Text("Please login to use chat feature!"),
+              );
             case ManageMessagesInitial:
               bloc.add(FetchChatRoomListEvent());
               return Center(
@@ -38,6 +42,15 @@ class ChatListPage extends StatelessWidget {
                 itemCount: chatRoomList.chatRoom.length,
                 itemBuilder: (context, index) {
                   return ListTile(
+                    leading: chatRoomList.currentUserType == "user"
+                        ? CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                chatRoomList.sellerList![index].profilePic ?? ""),
+                          )
+                        : CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                chatRoomList.userList![index].profilePic ?? ""),
+                          ),
                     title: (chatRoomList.currentUserType == "user")
                         ? Text(chatRoomList.sellerList![index].shopName ?? "")
                         : Text(chatRoomList.userList![index].username ?? ""),

@@ -9,6 +9,8 @@ sealed class CreateSellingItemState extends Equatable {
 
 final class CreateSellingItemInitial extends CreateSellingItemState {}
 
+final class CreateSellingItemLoading extends CreateSellingItemState {}
+
 final class CreateSellingItemSuccess extends CreateSellingItemState {
   final String message;
   CreateSellingItemSuccess({required this.message});

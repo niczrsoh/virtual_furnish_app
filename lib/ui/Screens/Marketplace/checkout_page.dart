@@ -17,33 +17,43 @@ class CheckoutPage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Checkout Page'),
         ),
-        bottomSheet: 
-            Container(
-              decoration: BoxDecoration(
-                color: CustomColor.primaryBackgroundColor,
-              ),
-              padding: PaddingStyles.paddingStyle1,
-              child: BlocBuilder<CheckoutBloc, CheckoutState>(
-                bloc: checkoutBloc,
-                buildWhen: (previous, current) => current is CheckoutLoaded,
-                builder: (context, state) {
-                  if(state is CheckoutInitial) return CircularProgressIndicator();
-                  state as CheckoutLoaded;
-                  return CustomButton(
-                              buttonText: 'Place Order',
-                              onPressed: () {
-                                //need to pass total amount charged for each shop and the total amount charge to user to the payment page
-                                Navigator.pushNamed(context, '/payment', arguments: {'cartProducts': state.cartProducts, 'total': state.totalPayment});},
-                                isDisabled: false,
-                                    );
-                },
-              ),
-            ),
+        bottomSheet: Container(
+          decoration: BoxDecoration(
+            color: CustomColor.primaryBackgroundColor,
+          ),
+          padding: PaddingStyles.paddingStyle1,
+          child: BlocBuilder<CheckoutBloc, CheckoutState>(
+            bloc: checkoutBloc,
+            buildWhen: (previous, current) => current is! CheckoutAddressState,
+            builder: (context, state) {
+              if (state is CheckoutInitial || state is CheckoutLoading)
+                return CircularProgressIndicator();
+              if (state is CheckoutLoaded) {
+                return CustomButton(
+                  buttonText: 'Place Order',
+                  onPressed: () {
+                    //need to pass total amount charged for each shop and the total amount charge to user to the payment page
+                    Navigator.pushNamed(context, '/payment', arguments: {
+                      'cartProducts': state.cartProducts,
+                      'total':
+                          state.totalPayment + state.cartProducts.length * 2.0
+                    });
+                  },
+                  isDisabled: false,
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: PaddingStyles.paddingStyle1,
             child: BlocConsumer<CheckoutBloc, CheckoutState>(
               bloc: checkoutBloc,
+              buildWhen: (previous, current) =>
+                  current is! CheckoutAddressState,
               listener: (context, state) {
                 // TODO: implement listener
               },
@@ -68,13 +78,19 @@ class CheckoutPage extends StatelessWidget {
                           height: 10,
                         ),
                         ListTile(
-                          title: Text('Name'),
-                          subtitle: Text('Address'),
+                          title: Text(state.address.isEmpty
+                              ? "No address added yet "
+                              : state.address.elementAt(0)),
+                          subtitle: Text(state.address.isEmpty
+                              ? "Kindly Tap on the edit icon button to add an address"
+                              : "Primary Address"),
                           trailing: IconButton(
                               icon: Icon(Icons.edit),
-                              onPressed: () {
-                                Navigator.pushNamed(
+                              onPressed: () async {
+                                await Navigator.pushNamed(
                                     context, '/delivery_address');
+                                checkoutBloc.add(LoadCheckout(
+                                    cartProducts: currentState.cartProducts));
                               }),
                         ),
                         SizedBox(
@@ -88,27 +104,56 @@ class CheckoutPage extends StatelessWidget {
                             return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(currentState.checkoutProducts.elementAt(index).sellerName!, style: CustomTextStyle.tertiaryTitleText(context),),
+                                  Text(
+                                    currentState.checkoutProducts
+                                        .elementAt(index)
+                                        .sellerName!,
+                                    style: CustomTextStyle.tertiaryTitleText(
+                                        context),
+                                  ),
                                   ListView.builder(
                                     shrinkWrap: true,
                                     physics: ScrollPhysics(),
                                     itemBuilder: (context, indexProducts) {
-                                      MarketplaceProductModel product = currentState.checkoutProducts.elementAt(index).sellerProducts!.elementAt(indexProducts).keys.elementAt(0);
-                                      int amount = currentState.checkoutProducts.elementAt(index).sellerProducts!.elementAt(indexProducts).values.elementAt(0);
+                                      MarketplaceProductModel product =
+                                          currentState.checkoutProducts
+                                              .elementAt(index)
+                                              .sellerProducts!
+                                              .elementAt(indexProducts)
+                                              .keys
+                                              .elementAt(0);
+                                      int amount = currentState.checkoutProducts
+                                          .elementAt(index)
+                                          .sellerProducts!
+                                          .elementAt(indexProducts)
+                                          .values
+                                          .elementAt(0);
                                       return ListTile(
-                                        leading: Container(child: Image.network(product.images![0], fit: BoxFit.cover,), width: 50, height: 50),
+                                        leading: Container(
+                                            child: Image.network(
+                                              product.images![0],
+                                              fit: BoxFit.cover,
+                                            ),
+                                            width: 50,
+                                            height: 50),
                                         title: Text(product.name!),
-                                        subtitle: Text("RM ${product.price?.toStringAsFixed(2)}"),
+                                        subtitle: Text(
+                                            "RM ${product.price?.toStringAsFixed(2)}"),
                                         trailing: Text("x $amount"),
                                       );
                                     },
                                     itemCount: currentState.checkoutProducts
-                                        .elementAt(index).sellerProducts!.length,
+                                        .elementAt(index)
+                                        .sellerProducts!
+                                        .length,
                                   ),
                                   ShopPaymentDetail(
                                       title: 'Shipping Fee', value: 2.0),
                                   ShopPaymentDetail(
-                                      title: 'Total Payment', value: currentState.checkoutProducts.elementAt(index).totalPayment!),
+                                      title: 'Total Payment',
+                                      value: currentState.checkoutProducts
+                                          .elementAt(index)
+                                          .totalPayment!),
                                   SizedBox(
                                     height: 10,
                                   )
@@ -137,16 +182,16 @@ class CheckoutPage extends StatelessWidget {
                           height: 10,
                         ),
                         PaymentDetail(
-                          title: 'Merchant Subtotal',
-                          value: currentState.totalPayment
-                        ),
+                            title: 'Merchant Subtotal',
+                            value: currentState.totalPayment),
                         PaymentDetail(
                           title: 'Delivery Subtotal',
                           value: currentState.cartProducts.length * 2.0,
                         ),
                         PaymentDetail(
                           title: 'Total Payment',
-                          value: currentState.totalPayment + currentState.cartProducts.length * 2.0,
+                          value: currentState.totalPayment +
+                              currentState.cartProducts.length * 2.0,
                         ),
                       ],
                     );

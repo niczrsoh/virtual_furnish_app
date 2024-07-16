@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:virtual_furnish_app/data/model/ARSpace/ar_media_storage_model.dart';
 import 'package:virtual_furnish_app/data/repo/ARSpace/ar_sapce_repo.dart';
+import 'package:virtual_furnish_app/data/repo/Authentication/auth_repo.dart';
 part 'ar_media_event.dart';
 part 'ar_media_state.dart';
 
@@ -15,6 +16,10 @@ class ArMediaBloc extends Bloc<ArMediaEvent, ArMediaState> {
 
   FutureOr<void> arMediaLoad(ArMediaLoad event, Emitter<ArMediaState> emit) async {
     emit(ArMediaLoading());
+    if(AuthRepo.isGuest()==true){
+      emit(ArMediaFromGuest());
+      return;
+    }
     List<ARMediaStorageModel> models= await ArSpaceRepo.getAllMedia();
     try{
     if(models.isNotEmpty){
